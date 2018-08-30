@@ -1,0 +1,6 @@
+_:b1 <http://example.org/p> _:b2.
+_:b2 <http://example.org/p> _:b3.
+
+_:ba <http://example.org/p> _:bb.
+_:bb <http://example.org/p> _:bc.
+_:bc <http://example.org/p> _:bd.
