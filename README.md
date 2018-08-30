@@ -31,7 +31,7 @@ const graphA = [
     DataFactory.blankNode('o1'),
   ),
 ];
-const graphA = [
+const graphB = [
   DataFactory.quad(
     DataFactory.blankNode('s2'),
     DataFactory.namedNode('p'),
@@ -51,7 +51,7 @@ const graphA = [
     DataFactory.blankNode('o1'),
   ),
 ];
-const graphA = [
+const graphB = [
   DataFactory.quad(
     DataFactory.blankNode('s2'),
     DataFactory.namedNode('p2'),
