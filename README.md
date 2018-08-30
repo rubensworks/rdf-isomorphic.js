@@ -16,14 +16,14 @@ This library accepts [RDFJS](http://rdf.js.org/)-compliant quads.
 
 The following examples assume the following imports:
 
-```
+```javascript
 import * as DataFactory from "@rdfjs/data-model"; // External library
 import {isomorphic} from "rdf-isomorphic";
 ```
 
 ### Check if two graphs are isomorphic
 
-```
+```javascript
 const graphA = [
   DataFactory.quad(
     DataFactory.blankNode('s1'),
@@ -43,7 +43,7 @@ isomorphic(graphA, graphB); // Outputs true
 
 ### Check if two graphs are **not** isomorphic
 
-```
+```javascript
 const graphA = [
   DataFactory.quad(
     DataFactory.blankNode('s1'),
