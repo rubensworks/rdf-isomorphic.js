@@ -122,6 +122,24 @@ describe('isomorphic', () => {
       ];
       return expect(isomorphic(graphA, graphB)).toBe(true);
     });
+
+    it('should not be isomorphic for 2 graphs with single full-blank triples', () => {
+      const graphA = [
+        DataFactory.quad(
+          DataFactory.blankNode('a1'),
+          DataFactory.blankNode('b1'),
+          DataFactory.blankNode('a1'),
+        ),
+      ];
+      const graphB = [
+        DataFactory.quad(
+          DataFactory.blankNode('a2'),
+          DataFactory.blankNode('b2'),
+          DataFactory.blankNode('c2'),
+        ),
+      ];
+      return expect(isomorphic(graphA, graphB)).toBe(false);
+    });
   });
 });
 
