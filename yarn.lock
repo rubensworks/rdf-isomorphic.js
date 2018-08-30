@@ -100,6 +100,10 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@rdfjs/data-model/-/data-model-1.1.0.tgz#15d9c5b7b8166893696565aefb65bad95da3fd99"
 
+"@types/events@*":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
+
 "@types/jest@^23.3.0":
   version "23.3.1"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.1.tgz#a4319aedb071d478e6f407d1c4578ec8156829cf"
@@ -108,11 +112,19 @@
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.0.tgz#69a23a3ad29caf0097f06eda59b361ee2f0639f6"
 
+"@types/n3@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/n3/-/n3-1.0.0.tgz#bc847d7a139a78f04ed8a232005c79a88f7dfa3f"
+  dependencies:
+    "@types/events" "*"
+    "@types/node" "*"
+    "@types/rdf-js" "*"
+
 "@types/node@*":
   version "10.9.3"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.9.3.tgz#85f288502503ade0b3bfc049fe1777b05d0327d5"
 
-"@types/rdf-js@^1.0.1":
+"@types/rdf-js@*", "@types/rdf-js@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/rdf-js/-/rdf-js-1.0.1.tgz#312e8478b608c3e2f66d3a2cae0c96c052c495a6"
   dependencies:
@@ -2079,6 +2091,10 @@ lodash.sortby@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
 
+lodash.uniqwith@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.uniqwith/-/lodash.uniqwith-4.5.0.tgz#7a0cbf65f43b5928625a9d4d0dc54b18cadc7ef3"
+
 lodash@^4.13.1, lodash@^4.17.10, lodash@^4.17.4, lodash@^4.17.5:
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
@@ -2237,6 +2253,10 @@ mkdirp@^0.5.0, mkdirp@^0.5.1:
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
+
+n3@^1.0.0-beta.2:
+  version "1.0.0-beta.2"
+  resolved "https://registry.yarnpkg.com/n3/-/n3-1.0.0-beta.2.tgz#fc5cce503fce06048cbc1cd804ba086f2f643a41"
 
 nan@^2.9.2:
   version "2.11.0"
@@ -2621,11 +2641,18 @@ rdf-quad@^1.2.2:
     "@rdfjs/data-model" "^1.1.0"
     rdf-string "1.2.0"
 
-rdf-string@1.2.0, rdf-string@^1.1.1:
+rdf-string@1.2.0, rdf-string@^1.1.1, rdf-string@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/rdf-string/-/rdf-string-1.2.0.tgz#25cd45ab168c8ed1cde62eb64ac3c2291fc551c0"
   dependencies:
     "@rdfjs/data-model" "^1.1.0"
+
+rdf-terms@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/rdf-terms/-/rdf-terms-1.2.0.tgz#92fc4c36348c4198f3be8f7d5c2f2c73b6569439"
+  dependencies:
+    "@rdfjs/data-model" "^1.1.0"
+    lodash.uniqwith "^4.5.0"
 
 read-pkg-up@^3.0.0:
   version "3.0.0"
