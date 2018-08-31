@@ -2,7 +2,6 @@ import {createHash} from "crypto";
 import * as RDF from "rdf-js";
 import {quadToStringQuad, termToString} from "rdf-string";
 import {everyTerms, getBlankNodes, getTerms, someTerms, uniqTerms} from "rdf-terms";
-import {arraysAreEqual} from "tslint/lib/utils";
 
 /**
  * Determines if the two given graphs are isomorphic.
@@ -93,8 +92,8 @@ export function getBijectionInner(blankQuadsA: RDF.Quad[], blankQuadsB: RDF.Quad
 
   // Check if all nodes from graph A and B are present in the bijection,
   // if not, speculatively mark pairs with matching ungrounded hashes as bijected, and recurse.
-  if (!arraysAreEqual(Object.keys(bijection).sort(), blankNodesA.map(termToString).sort(), (a, b) => a === b)
-    || !arraysAreEqual(hashValues(bijection).sort(), blankNodesB.map(termToString).sort(), (a, b) => a === b)) {
+  if (!arraysEqual(Object.keys(bijection).sort(), blankNodesA.map(termToString).sort())
+    || !arraysEqual(hashValues(bijection).sort(), blankNodesB.map(termToString).sort())) {
     // I have not yet been able to find any pathological cases where this code is reached.
     // This may be removable, but let's wait until someone proves that.
     bijection = null;
@@ -120,6 +119,19 @@ export function getBijectionInner(blankQuadsA: RDF.Quad[], blankQuadsB: RDF.Quad
 
   return bijection;
 
+}
+
+function arraysEqual(array1: any[], array2: any[]) {
+  if (array1.length !== array2.length) {
+    return false;
+  }
+  for (let i = array1.length; i--;) {
+    if (array1[i] !== array2[i]) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**
