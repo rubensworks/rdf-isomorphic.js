@@ -108,10 +108,6 @@
   version "23.3.1"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.1.tgz#a4319aedb071d478e6f407d1c4578ec8156829cf"
 
-"@types/minimist@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.0.tgz#69a23a3ad29caf0097f06eda59b361ee2f0639f6"
-
 "@types/n3@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/n3/-/n3-1.0.0.tgz#bc847d7a139a78f04ed8a232005c79a88f7dfa3f"
@@ -124,15 +120,15 @@
   version "10.9.3"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.9.3.tgz#85f288502503ade0b3bfc049fe1777b05d0327d5"
 
-"@types/rdf-js@*", "@types/rdf-js@^1.0.1":
+"@types/rdf-js@*":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/rdf-js/-/rdf-js-1.0.1.tgz#312e8478b608c3e2f66d3a2cae0c96c052c495a6"
   dependencies:
     "@types/node" "*"
 
-"@types/sax@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@types/sax/-/sax-1.0.1.tgz#904fb944c4859936204f1f445a8533d09b6629e8"
+"@types/rdf-js@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/rdf-js/-/rdf-js-2.0.0.tgz#1cc201ee3086ecfabbf0471dcec7813ff56c0247"
   dependencies:
     "@types/node" "*"
 
