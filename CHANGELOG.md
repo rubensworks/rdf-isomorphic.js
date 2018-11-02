@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.0.3"></a>
+## [v1.0.3](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.0.2...v1.0.3) - 2018-11-02
+
+### Fixed
+* [Fix isomorphic test not working on duplicate quads](https://github.com/rubensworks/rdf-isomorphic.js/commit/4c7af9a15df3fbdbdb73027d8896477dc3043c72)
+
 <a name="1.0.2"></a>
 ## [1.0.2](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.1.0...v1.0.2) - 2018-08-31
 ### Fixed
