@@ -3,6 +3,7 @@ import {createReadStream, readdirSync} from "fs";
 import {StreamParser} from 'n3';
 import * as RDF from "rdf-js";
 import {
+  deindexGraph,
   getGraphBlankNodes, getQuadsWithBlankNodes, getQuadsWithoutBlankNodes,
   hashTerm,
   hashTerms, hashValues, hasValue, indexGraph,
@@ -10,7 +11,7 @@ import {
   isTermGrounded,
   quadToSignature,
   sha1hex,
-  termToSignature,
+  termToSignature, uniqGraph,
 } from "../lib/RdfIsomorphic";
 // tslint:disable-next-line:no-var-requires
 const arrayifyStream = require('arrayify-stream');
@@ -118,6 +119,34 @@ describe('isomorphic', () => {
           DataFactory.blankNode('c2'),
           DataFactory.blankNode('e2'),
           DataFactory.blankNode('f2'),
+        ),
+      ];
+      return expect(isomorphic(graphA, graphB)).toBe(true);
+    });
+
+    it('should be isomorphic for 2 equal graphs where one contains duplicates', () => {
+      const graphA = [
+        DataFactory.quad(
+          DataFactory.namedNode('a1'),
+          DataFactory.blankNode('b1'),
+          DataFactory.blankNode('c1'),
+        ),
+      ];
+      const graphB = [
+        DataFactory.quad(
+          DataFactory.namedNode('a1'),
+          DataFactory.blankNode('b2'),
+          DataFactory.blankNode('c2'),
+        ),
+        DataFactory.quad(
+          DataFactory.namedNode('a1'),
+          DataFactory.blankNode('b2'),
+          DataFactory.blankNode('c2'),
+        ),
+        DataFactory.quad(
+          DataFactory.namedNode('a1'),
+          DataFactory.blankNode('b2'),
+          DataFactory.blankNode('c2'),
         ),
       ];
       return expect(isomorphic(graphA, graphB)).toBe(true);
@@ -318,6 +347,112 @@ describe('indexGraph', () => {
       "{\"subject\":\"s2\",\"predicate\":\"p2\",\"object\":\"o2\",\"graph\":\"g2\"}": true,
       "{\"subject\":\"s3\",\"predicate\":\"p3\",\"object\":\"o3\",\"graph\":\"g3\"}": true,
     });
+  });
+});
+
+describe('deindexGraph', () => {
+  it('should deindex for an empty graph', () => {
+    return expect(deindexGraph({})).toEqual([]);
+  });
+
+  it('should deindex for a graph with one quad', () => {
+    return expect(deindexGraph({
+      "{\"subject\":\"s1\",\"predicate\":\"p1\",\"object\":\"o1\",\"graph\":\"g1\"}": true,
+    })).toEqual([
+      DataFactory.quad(
+        DataFactory.namedNode('s1'),
+        DataFactory.namedNode('p1'),
+        DataFactory.namedNode('o1'),
+        DataFactory.namedNode('g1'),
+      ),
+    ]);
+  });
+
+  it('should deindex for a graph with three quads', () => {
+    return expect(deindexGraph({
+      "{\"subject\":\"s1\",\"predicate\":\"p1\",\"object\":\"o1\",\"graph\":\"g1\"}": true,
+      "{\"subject\":\"s2\",\"predicate\":\"p2\",\"object\":\"o2\",\"graph\":\"g2\"}": true,
+      "{\"subject\":\"s3\",\"predicate\":\"p3\",\"object\":\"o3\",\"graph\":\"g3\"}": true,
+    })).toEqual([
+      DataFactory.quad(
+        DataFactory.namedNode('s1'),
+        DataFactory.namedNode('p1'),
+        DataFactory.namedNode('o1'),
+        DataFactory.namedNode('g1'),
+      ),
+      DataFactory.quad(
+        DataFactory.namedNode('s2'),
+        DataFactory.namedNode('p2'),
+        DataFactory.namedNode('o2'),
+        DataFactory.namedNode('g2'),
+      ),
+      DataFactory.quad(
+        DataFactory.namedNode('s3'),
+        DataFactory.namedNode('p3'),
+        DataFactory.namedNode('o3'),
+        DataFactory.namedNode('g3'),
+      ),
+    ]);
+  });
+});
+
+describe('uniqGraph', () => {
+  it('should uniqueify for an empty graph', () => {
+    return expect(uniqGraph([])).toEqual([]);
+  });
+
+  it('should uniqueify for a graph with one quad', () => {
+    return expect(uniqGraph([
+      DataFactory.quad(
+        DataFactory.namedNode('s1'),
+        DataFactory.namedNode('p1'),
+        DataFactory.namedNode('o1'),
+        DataFactory.namedNode('g1'),
+      ),
+    ])).toEqual([
+      DataFactory.quad(
+        DataFactory.namedNode('s1'),
+        DataFactory.namedNode('p1'),
+        DataFactory.namedNode('o1'),
+        DataFactory.namedNode('g1'),
+      ),
+    ]);
+  });
+
+  it('should uniqueify for a graph with two unique quads', () => {
+    return expect(uniqGraph([
+      DataFactory.quad(
+        DataFactory.namedNode('s1'),
+        DataFactory.namedNode('p1'),
+        DataFactory.namedNode('o1'),
+        DataFactory.namedNode('g1'),
+      ),
+      DataFactory.quad(
+        DataFactory.namedNode('s2'),
+        DataFactory.namedNode('p2'),
+        DataFactory.namedNode('o2'),
+        DataFactory.namedNode('g2'),
+      ),
+      DataFactory.quad(
+        DataFactory.namedNode('s1'),
+        DataFactory.namedNode('p1'),
+        DataFactory.namedNode('o1'),
+        DataFactory.namedNode('g1'),
+      ),
+    ])).toEqual([
+      DataFactory.quad(
+        DataFactory.namedNode('s1'),
+        DataFactory.namedNode('p1'),
+        DataFactory.namedNode('o1'),
+        DataFactory.namedNode('g1'),
+      ),
+      DataFactory.quad(
+        DataFactory.namedNode('s2'),
+        DataFactory.namedNode('p2'),
+        DataFactory.namedNode('o2'),
+        DataFactory.namedNode('g2'),
+      ),
+    ]);
   });
 });
 

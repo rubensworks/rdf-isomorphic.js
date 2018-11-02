@@ -1,6 +1,6 @@
 import {createHash} from "crypto";
 import * as RDF from "rdf-js";
-import {quadToStringQuad, termToString} from "rdf-string";
+import {quadToStringQuad, stringQuadToQuad, termToString} from "rdf-string";
 import {everyTerms, getBlankNodes, getTerms, someTerms, uniqTerms} from "rdf-terms";
 
 /**
@@ -23,11 +23,6 @@ export function isomorphic(graphA: RDF.Quad[], graphB: RDF.Quad[]): boolean {
  * @return {IBijection} A hash representing a bijection, or null if none could be found.
  */
 export function getBijection(graphA: RDF.Quad[], graphB: RDF.Quad[]): IBijection {
-  // Quickly break if the number of quads is different.
-  if (graphA.length !== graphB.length) {
-    return null;
-  }
-
   // Check if all (non-blanknode-containing) quads in the two graphs are equal.
   // We do this by creating a hash-based index for both graphs.
   const nonBlankIndexA: {[quad: string]: boolean} = indexGraph(getQuadsWithoutBlankNodes(graphA));
@@ -42,8 +37,8 @@ export function getBijection(graphA: RDF.Quad[], graphB: RDF.Quad[]): IBijection
   }
 
   // Pre-process data that needs to be present in each iteration of getBijectionInner.
-  const blankQuadsA: RDF.Quad[] = getQuadsWithBlankNodes(graphA);
-  const blankQuadsB: RDF.Quad[] = getQuadsWithBlankNodes(graphB);
+  const blankQuadsA: RDF.Quad[] = uniqGraph(getQuadsWithBlankNodes(graphA));
+  const blankQuadsB: RDF.Quad[] = uniqGraph(getQuadsWithBlankNodes(graphB));
   const blankNodesA: RDF.BlankNode[] = getGraphBlankNodes(graphA);
   const blankNodesB: RDF.BlankNode[] = getGraphBlankNodes(graphB);
 
@@ -191,6 +186,25 @@ export function indexGraph(graph: RDF.Quad[]): {[quad: string]: boolean} {
     index[JSON.stringify(quadToStringQuad(quad))] = true;
   }
   return index;
+}
+
+/**
+ * Create a graph from the given hash-based index.
+ * @param {{[p: string]: boolean}} indexedGraph A hash-based datastructure representing the graph.
+ * @return {Quad[]} An array of quads, the order does not matter.
+ */
+export function deindexGraph(indexedGraph: {[quad: string]: boolean}): RDF.Quad[] {
+  return Object.keys(indexedGraph).map((str) => stringQuadToQuad(JSON.parse(str)));
+}
+
+/**
+ * Unique-ify the given RDF graph based on strict equality.
+ * The output graph will consist of new quad and term instances.
+ * @param {Quad[]} graph An input graph.
+ * @return {Quad[]} The input graph without duplicates.
+ */
+export function uniqGraph(graph: RDF.Quad[]): RDF.Quad[] {
+  return deindexGraph(indexGraph(graph));
 }
 
 /**
