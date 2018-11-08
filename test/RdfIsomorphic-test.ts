@@ -24,14 +24,14 @@ describe('isomorphic', () => {
     /* These cases are not possible in practise, as RDF does not allow blank predicates. */
     it('should be isomorphic for 2 graphs with single full-blank triples', () => {
       const graphA = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('a1'),
           DataFactory.blankNode('b1'),
           DataFactory.blankNode('c1'),
         ),
       ];
       const graphB = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('a2'),
           DataFactory.blankNode('b2'),
           DataFactory.blankNode('c2'),
@@ -42,24 +42,24 @@ describe('isomorphic', () => {
 
     it('should be isomorphic for 2 graphs with two unconnected full-blank triples', () => {
       const graphA = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('a1'),
           DataFactory.blankNode('b1'),
           DataFactory.blankNode('c1'),
         ),
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('d1'),
           DataFactory.blankNode('e1'),
           DataFactory.blankNode('f1'),
         ),
       ];
       const graphB = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('a2'),
           DataFactory.blankNode('b2'),
           DataFactory.blankNode('c2'),
         ),
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('d2'),
           DataFactory.blankNode('e2'),
           DataFactory.blankNode('f2'),
@@ -70,24 +70,24 @@ describe('isomorphic', () => {
 
     it('should be isomorphic for 2 graphs with two connected full-blank triples', () => {
       const graphA = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('a1'),
           DataFactory.blankNode('b1'),
           DataFactory.blankNode('c1'),
         ),
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('c1'),
           DataFactory.blankNode('e1'),
           DataFactory.blankNode('f1'),
         ),
       ];
       const graphB = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('a2'),
           DataFactory.blankNode('b2'),
           DataFactory.blankNode('c2'),
         ),
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('c2'),
           DataFactory.blankNode('e2'),
           DataFactory.blankNode('f2'),
@@ -98,24 +98,24 @@ describe('isomorphic', () => {
 
     it('should be isomorphic for 2 graphs with two connected partially-blank triples', () => {
       const graphA = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.namedNode('a1'),
           DataFactory.blankNode('b1'),
           DataFactory.blankNode('c1'),
         ),
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('c1'),
           DataFactory.blankNode('e1'),
           DataFactory.blankNode('f1'),
         ),
       ];
       const graphB = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.namedNode('a1'),
           DataFactory.blankNode('b2'),
           DataFactory.blankNode('c2'),
         ),
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('c2'),
           DataFactory.blankNode('e2'),
           DataFactory.blankNode('f2'),
@@ -126,24 +126,24 @@ describe('isomorphic', () => {
 
     it('should be isomorphic for 2 equal graphs where one contains duplicates', () => {
       const graphA = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.namedNode('a1'),
           DataFactory.blankNode('b1'),
           DataFactory.blankNode('c1'),
         ),
       ];
       const graphB = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.namedNode('a1'),
           DataFactory.blankNode('b2'),
           DataFactory.blankNode('c2'),
         ),
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.namedNode('a1'),
           DataFactory.blankNode('b2'),
           DataFactory.blankNode('c2'),
         ),
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.namedNode('a1'),
           DataFactory.blankNode('b2'),
           DataFactory.blankNode('c2'),
@@ -154,14 +154,14 @@ describe('isomorphic', () => {
 
     it('should not be isomorphic for 2 graphs with single full-blank triples', () => {
       const graphA = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('a1'),
           DataFactory.blankNode('b1'),
           DataFactory.blankNode('a1'),
         ),
       ];
       const graphB = [
-        DataFactory.quad(
+        DataFactory.quad<RDF.BaseQuad>(
           DataFactory.blankNode('a2'),
           DataFactory.blankNode('b2'),
           DataFactory.blankNode('c2'),
@@ -521,7 +521,7 @@ describe('getGraphBlankNodes', () => {
 describe('hashTerms', () => {
   it('should create grounded hashes for a single quad with equal terms and empty hash', () => {
     expect(hashTerms([
-      DataFactory.quad(
+      DataFactory.quad<RDF.BaseQuad>(
         DataFactory.blankNode('abc'),
         DataFactory.blankNode('abc'),
         DataFactory.blankNode('abc'),
@@ -631,7 +631,7 @@ describe('hashTerm', () => {
   it('should create ungrounded hashes for a single quad with the blank node that is not hashed but also ' +
     'has another non-hashed blank node', () => {
     expect(hashTerm(DataFactory.blankNode('abc'), [
-      DataFactory.quad(
+      DataFactory.quad<RDF.BaseQuad>(
         DataFactory.blankNode('abc'),
         DataFactory.blankNode('def'),
         DataFactory.namedNode('ghi'),
@@ -642,12 +642,12 @@ describe('hashTerm', () => {
   it('should create ungrounded hashes for a two quads with the same blank node that is not hashed but also ' +
     'has another non-hashed blank node', () => {
     expect(hashTerm(DataFactory.blankNode('abc'), [
-      DataFactory.quad(
+      DataFactory.quad<RDF.BaseQuad>(
         DataFactory.blankNode('abc'),
         DataFactory.blankNode('def1'),
         DataFactory.namedNode('ghi1'),
       ),
-      DataFactory.quad(
+      DataFactory.quad<RDF.BaseQuad>(
         DataFactory.blankNode('abc'),
         DataFactory.blankNode('def2'),
         DataFactory.namedNode('ghi2'),
@@ -658,12 +658,12 @@ describe('hashTerm', () => {
   it('should create ungrounded hashes for a two quads, one with the same blank node, and one with another ' +
     'that is not hashed but also has another non-hashed blank node', () => {
     expect(hashTerm(DataFactory.blankNode('abc'), [
-      DataFactory.quad(
+      DataFactory.quad<RDF.BaseQuad>(
         DataFactory.blankNode('abc'),
         DataFactory.blankNode('def1'),
         DataFactory.namedNode('ghi1'),
       ),
-      DataFactory.quad(
+      DataFactory.quad<RDF.BaseQuad>(
         DataFactory.blankNode('other'),
         DataFactory.blankNode('def2'),
         DataFactory.namedNode('ghi2'),
@@ -674,7 +674,7 @@ describe('hashTerm', () => {
   it('should create grounded hashes for a single quad with the blank node that is not hashed but also ' +
     'has another hashed blank node', () => {
     expect(hashTerm(DataFactory.blankNode('abc'), [
-      DataFactory.quad(
+      DataFactory.quad<RDF.BaseQuad>(
         DataFactory.blankNode('abc'),
         DataFactory.blankNode('def'),
         DataFactory.namedNode('ghi'),
@@ -685,7 +685,7 @@ describe('hashTerm', () => {
   it('should create grounded hashes for a single quad2 with the blank node that is not hashed but also ' +
     'has another hashed blank node', () => {
     expect(hashTerm(DataFactory.blankNode('def'), [
-      DataFactory.quad(
+      DataFactory.quad<RDF.BaseQuad>(
         DataFactory.blankNode('abc'),
         DataFactory.blankNode('def'),
         DataFactory.namedNode('ghi'),
