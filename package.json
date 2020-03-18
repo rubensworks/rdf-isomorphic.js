@@ -35,7 +35,7 @@
     "@types/n3": "^1.1.4",
     "arrayify-stream": "^1.0.0",
     "coveralls": "^3.0.0",
-    "jest": "^24.3.0",
+    "jest": "^25.0.0",
     "jest-rdf": "^1.1.0",
     "manual-git-changelog": "^1.0.0",
     "n3": "^1.0.0-beta.2",
