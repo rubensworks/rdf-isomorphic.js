@@ -61,6 +61,34 @@ const graphB = [
 isomorphic(graphA, graphB); // Outputs false
 ```
 
+### Check if two graphs with nested quads are isomorphic
+
+```javascript
+const graphA = [
+  DataFactory.quad(
+    DataFactory.quad(
+      DataFactory.blankNode('sInner'),
+      DataFactory.namedNode('pInner'),
+      DataFactory.blankNode('o1'),
+    ),
+    DataFactory.namedNode('pOuter'),
+    DataFactory.namedNode('oOuter'),
+  )
+];
+const graphB = [
+  DataFactory.quad(
+    DataFactory.quad(
+      DataFactory.blankNode('sInner'),
+      DataFactory.namedNode('pInner'),
+      DataFactory.blankNode('o2'),
+    ),
+    DataFactory.namedNode('pOuter'),
+    DataFactory.namedNode('oOuter'),
+  )
+];
+isomorphic(graphA, graphB); // Outputs true
+```
+
 ## Algorithm
 
 This algorithm is based on the [RDF isomorphism checker in RDF.rb](http://blog.datagraph.org/2010/03/rdf-isomorphism),
@@ -71,6 +99,8 @@ These hashes are then compared between the two given graphs, and a bijection is 
 If no such bijection can be found, then the graphs are considered non-isomorphic.
 
 The implementation of this package is inspired by the Ruby [RDF::Isomorphic](https://github.com/ruby-rdf/rdf-Isomorphic) gem.
+
+The algorithm has been adapted to work this nested quads by [Ruben Taelman](http://rubensworks.net/).
 
 ## License
 This software is written by [Ruben Taelman](http://rubensworks.net/).

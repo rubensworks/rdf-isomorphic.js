@@ -1,0 +1,4 @@
+<<<ex:s> <ex:p> _:abc1>> <ex:p2> <ex:o> .
+<<<ex:s> <ex:p> _:abc2>> <ex:p2> <ex:o> .
+_:abc1 <ex:p1> <ex:o>.
+_:abc2 <ex:p2> <ex:o>.

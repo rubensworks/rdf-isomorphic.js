@@ -1,0 +1,4 @@
+<<<ex:s> <ex:p> _:def1>> <ex:p2> <ex:o> .
+<<<ex:s> <ex:p> _:OTHER1>> <ex:p2> <ex:o> .
+_:def1 <ex:p1> <ex:o>.
+_:OTHER2 <ex:p2> <ex:o>.

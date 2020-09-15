@@ -3289,10 +3289,10 @@ rdf-terms@^1.4.0:
     "@rdfjs/data-model" "^1.1.1"
     lodash.uniqwith "^4.5.0"
 
-rdf-terms@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/rdf-terms/-/rdf-terms-1.6.0.tgz#54f3104b4b208cf7e0e2a159068cafca3233e172"
-  integrity sha512-2f8rwOmZmM8qbRHAgTL54GIuhkD+4klhqRdTXfrxL4ickUdgXYPBpDduvvyluXse6xd0UmcXPaKFRb9vsUwHXA==
+rdf-terms@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/rdf-terms/-/rdf-terms-1.6.2.tgz#e31ad9023e0ee163dafa3dd847410c61556d0d57"
+  integrity sha512-dASpdYHYLEwzN9iSymJie1WUj6VHXy1By8Am4g2rJlhTfVvNitsJpDY+A3X2QehlGhCaWjHMzXS4q/JKNPI80A==
   dependencies:
     lodash.uniqwith "^4.5.0"
     rdf-data-factory "^1.0.1"
