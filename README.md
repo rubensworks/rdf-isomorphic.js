@@ -17,25 +17,27 @@ This library accepts [RDFJS](http://rdf.js.org/)-compliant quads.
 The following examples assume the following imports:
 
 ```javascript
-import * as DataFactory from "@rdfjs/data-model"; // External library
-import {isomorphic} from "rdf-isomorphic";
+import { DataFactory } from "rdf-data-factory"; // External library
+import { isomorphic } from "rdf-isomorphic";
+
+const factory = new DataFactory();
 ```
 
 ### Check if two graphs are isomorphic
 
 ```javascript
 const graphA = [
-  DataFactory.quad(
-    DataFactory.blankNode('s1'),
-    DataFactory.namedNode('p'),
-    DataFactory.blankNode('o1'),
+  factory.quad(
+    factory.blankNode('s1'),
+    factory.namedNode('p'),
+    factory.blankNode('o1'),
   ),
 ];
 const graphB = [
-  DataFactory.quad(
-    DataFactory.blankNode('s2'),
-    DataFactory.namedNode('p'),
-    DataFactory.blankNode('o2'),
+  factory.quad(
+    factory.blankNode('s2'),
+    factory.namedNode('p'),
+    factory.blankNode('o2'),
   ),
 ];
 isomorphic(graphA, graphB); // Outputs true
@@ -45,17 +47,17 @@ isomorphic(graphA, graphB); // Outputs true
 
 ```javascript
 const graphA = [
-  DataFactory.quad(
-    DataFactory.blankNode('s1'),
-    DataFactory.namedNode('p1'),
-    DataFactory.blankNode('o1'),
+  factory.quad(
+    factory.blankNode('s1'),
+    factory.namedNode('p1'),
+    factory.blankNode('o1'),
   ),
 ];
 const graphB = [
-  DataFactory.quad(
-    DataFactory.blankNode('s2'),
-    DataFactory.namedNode('p2'),
-    DataFactory.blankNode('o2'),
+  factory.quad(
+    factory.blankNode('s2'),
+    factory.namedNode('p2'),
+    factory.blankNode('o2'),
   ),
 ];
 isomorphic(graphA, graphB); // Outputs false
@@ -65,25 +67,25 @@ isomorphic(graphA, graphB); // Outputs false
 
 ```javascript
 const graphA = [
-  DataFactory.quad(
-    DataFactory.quad(
-      DataFactory.blankNode('sInner'),
-      DataFactory.namedNode('pInner'),
-      DataFactory.blankNode('o1'),
+  factory.quad(
+    factory.quad(
+      factory.blankNode('sInner'),
+      factory.namedNode('pInner'),
+      factory.blankNode('o1'),
     ),
-    DataFactory.namedNode('pOuter'),
-    DataFactory.namedNode('oOuter'),
+    factory.namedNode('pOuter'),
+    factory.namedNode('oOuter'),
   )
 ];
 const graphB = [
-  DataFactory.quad(
-    DataFactory.quad(
-      DataFactory.blankNode('sInner'),
-      DataFactory.namedNode('pInner'),
-      DataFactory.blankNode('o2'),
+  factory.quad(
+    factory.quad(
+      factory.blankNode('sInner'),
+      factory.namedNode('pInner'),
+      factory.blankNode('o2'),
     ),
-    DataFactory.namedNode('pOuter'),
-    DataFactory.namedNode('oOuter'),
+    factory.namedNode('pOuter'),
+    factory.namedNode('oOuter'),
   )
 ];
 isomorphic(graphA, graphB); // Outputs true
