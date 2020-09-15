@@ -1,7 +1,7 @@
 import {createHash} from "crypto";
 import * as RDF from "rdf-js";
 import {quadToStringQuad, stringQuadToQuad, termToString} from "rdf-string";
-import {everyTerms, getBlankNodes, getTerms, someTerms, uniqTerms} from "rdf-terms";
+import {everyTerms, getBlankNodes, getTerms, someTerms, uniqTerms, getTermsNested} from "rdf-terms";
 
 /**
  * Determines if the two given graphs are isomorphic.
@@ -163,7 +163,10 @@ export function hasValue(hash: any, value: any) {
  * @return {Quad[]} An array of quads with blank nodes
  */
 export function getQuadsWithBlankNodes<Q extends RDF.BaseQuad = RDF.Quad>(graph: Q[]): Q[] {
-  return graph.filter((quad: Q) => someTerms(quad, (value: RDF.Term) => value.termType === 'BlankNode'));
+  return graph.filter((quad: Q) => someTerms(quad, (value: RDF.Term) => {
+    return value.termType === 'BlankNode'
+      || (value.termType === 'Quad' && getTermsNested(value).some(term => term.termType === 'BlankNode'));
+  }));
 }
 
 /**
@@ -172,7 +175,10 @@ export function getQuadsWithBlankNodes<Q extends RDF.BaseQuad = RDF.Quad>(graph:
  * @return {Quad[]} An array of quads without blank nodes
  */
 export function getQuadsWithoutBlankNodes<Q extends RDF.BaseQuad = RDF.Quad>(graph: Q[]): Q[] {
-  return graph.filter((quad: Q) => everyTerms(quad, (value: RDF.Term) => value.termType !== 'BlankNode'));
+  return graph.filter((quad: Q) => everyTerms(quad, (value: RDF.Term) => {
+    return value.termType !== 'BlankNode'
+      && !(value.termType === 'Quad' && getTermsNested(value).some(term => term.termType === 'BlankNode'));
+  }));
 }
 
 /**
@@ -213,7 +219,7 @@ export function uniqGraph<Q extends RDF.BaseQuad = RDF.Quad>(graph: Q[]): Q[] {
  * @return {BlankNode[]} A list of (unique) blank nodes.
  */
 export function getGraphBlankNodes<Q extends RDF.BaseQuad = RDF.Quad>(graph: Q[]): RDF.BlankNode[] {
-  return uniqTerms(graph.map((quad: Q) => getBlankNodes(getTerms(quad)))
+  return uniqTerms(graph.map((quad: Q) => getBlankNodes(getTermsNested(quad)))
     .reduce((acc: RDF.BlankNode[], val: RDF.BlankNode[]) => acc.concat(val), []));
 }
 
@@ -291,9 +297,10 @@ export function hashTerm<Q extends RDF.BaseQuad = RDF.Quad>(term: RDF.Term, quad
   const quadSignatures = [];
   let grounded: boolean = true;
   for (const quad of quads) {
-    if (someTerms(quad, (quadTerm: RDF.Term) => quadTerm.equals(term))) {
+    const terms = getTermsNested(quad);
+    if (terms.some((quadTerm: RDF.Term) => quadTerm.equals(term))) {
       quadSignatures.push(quadToSignature(quad, hashes, term));
-      for (const quadTerm of getTerms(quad)) {
+      for (const quadTerm of terms) {
         if (!isTermGrounded(quadTerm, hashes) && !quadTerm.equals(term)) {
           grounded = false;
         }
@@ -336,6 +343,8 @@ export function termToSignature(term: RDF.Term, hashes: ITermHash, target: RDF.T
     return '@self';
   } else if (term.termType === 'BlankNode') {
     return hashes[termToString(term)] || '@blank';
+  } else if (term.termType === 'Quad') {
+    return `<${quadToSignature(term, hashes, target)}>`;
   } else {
     return termToString(term);
   }
@@ -352,7 +361,10 @@ export function termToSignature(term: RDF.Term, hashes: ITermHash, target: RDF.T
  * @return {boolean} If the given term is grounded.
  */
 export function isTermGrounded(term: RDF.Term, hashes: ITermHash): boolean {
-  return term.termType !== 'BlankNode' || !!hashes[termToString(term)];
+  return (
+    term.termType !== 'BlankNode'
+    && !(term.termType === 'Quad' && getTermsNested(term).some(subTerm => !isTermGrounded(subTerm, hashes)))
+  ) || !!hashes[termToString(term)];
 }
 
 export interface ITermHash {
