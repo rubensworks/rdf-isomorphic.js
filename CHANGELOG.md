@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.2.0"></a>
+## [v1.2.0](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.1.0...v1.2.0) - 2020-09-15
+
+### Added
+* [Add support for nested quads](https://github.com/rubensworks/rdf-isomorphic.js/commit/1f2f4020fbc10f3eb81b7bdad85e48f4c7d36601)
+
 <a name="v1.1.0"></a>
 ## [v1.1.0](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.0.3...v1.1.0) - 2018-11-08
 
