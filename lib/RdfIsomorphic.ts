@@ -1,4 +1,4 @@
-import {createHash} from "crypto";
+import {sha1} from "hash.js";
 import * as RDF from "rdf-js";
 import {quadToStringQuad, stringQuadToQuad, termToString} from "rdf-string";
 import {everyTerms, getBlankNodes, getTerms, someTerms, uniqTerms, getTermsNested} from "rdf-terms";
@@ -317,7 +317,7 @@ export function hashTerm<Q extends RDF.BaseQuad = RDF.Quad>(term: RDF.Term, quad
  * @return {string} A hash string.
  */
 export function sha1hex(data: string | Buffer | NodeJS.TypedArray | DataView): string {
-  return createHash('sha1').update(data).digest('hex');
+  return sha1().update(data).digest('hex');
 }
 
 /**
