@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.2.1"></a>
+## [v1.2.1](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.1.0...v1.2.1) - 2021-04-04
+
+### Changed
+* [Switches from crypto to hash.js for smaller bundle size](https://github.com/rubensworks/rdf-isomorphic.js/commit/403b5fa6cbff1b88a07db66386e3c18266f080bc)
+
 <a name="v1.2.0"></a>
 ## [v1.2.0](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.1.0...v1.2.0) - 2020-09-15
 
