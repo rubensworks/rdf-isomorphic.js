@@ -1,6 +1,6 @@
 # RDF Isomorphism
 
-[![Build Status](https://travis-ci.org/rubensworks/rdf-isomorphic.js.svg?branch=master)](https://travis-ci.org/rubensworks/rdf-isomorphic.js)
+[![Build status](https://github.com/rubensworks/rdf-isomorphic.js/workflows/CI/badge.svg)](https://github.com/rubensworks/rdf-isomorphic.js/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/rubensworks/rdf-isomorphic.js/badge.svg?branch=master)](https://coveralls.io/github/rubensworks/rdf-isomorphic.js?branch=master)
 [![npm version](https://badge.fury.io/js/rdf-isomorphic.svg)](https://www.npmjs.com/package/rdf-isomorphic)
 
