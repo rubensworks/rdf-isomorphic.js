@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.3.0"></a>
+## [v1.3.0](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.2.1...v1.3.0) - 2021-08-11
+
+### Changed
+* [Migrate to @rdfjs/types](https://github.com/rubensworks/rdf-isomorphic.js/commit/af89a0ab8ad7a99fb3918e5bba0eb6d56b6ca6fc)
+
 <a name="v1.2.1"></a>
 ## [v1.2.1](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.1.0...v1.2.1) - 2021-04-04
 
