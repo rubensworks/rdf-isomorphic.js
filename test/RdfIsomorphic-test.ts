@@ -1,7 +1,7 @@
 import { DataFactory } from "rdf-data-factory";
 import {createReadStream, readdirSync} from "fs";
 import {StreamParser} from 'n3';
-import * as RDF from "rdf-js";
+import * as RDF from "@rdfjs/types";
 import {
   deindexGraph,
   getGraphBlankNodes, getQuadsWithBlankNodes, getQuadsWithoutBlankNodes,

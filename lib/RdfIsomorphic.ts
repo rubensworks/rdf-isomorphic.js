@@ -1,5 +1,5 @@
 import {sha1} from "hash.js";
-import * as RDF from "rdf-js";
+import * as RDF from "@rdfjs/types";
 import {quadToStringQuad, stringQuadToQuad, termToString} from "rdf-string";
 import {everyTerms, getBlankNodes, getTerms, someTerms, uniqTerms, getTermsNested} from "rdf-terms";
 
