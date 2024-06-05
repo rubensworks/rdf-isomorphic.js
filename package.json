@@ -35,7 +35,7 @@
   "devDependencies": {
     "@types/jest": "^26.0.0",
     "@types/n3": "^1.10.3",
-    "arrayify-stream": "^1.0.0",
+    "arrayify-stream": "^2.0.0",
     "coveralls": "^3.0.0",
     "jest": "^27.0.1",
     "jest-rdf": "^1.1.0",
