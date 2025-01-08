@@ -42,7 +42,7 @@
     "arrayify-stream": "^1.0.0",
     "coveralls": "^3.0.0",
     "jest": "^27.0.1",
-    "jest-rdf": "^1.1.0",
+    "jest-rdf": "^1.8.1",
     "manual-git-changelog": "^1.0.0",
     "n3": "^1.6.3",
     "pre-commit": "^1.2.2",
@@ -51,7 +51,7 @@
     "ts-jest": "^27.0.1",
     "tslint": "^6.0.0",
     "tslint-eslint-rules": "^5.3.1",
-    "typescript": "^5.0.0"
+    "typescript": "^5.7.2"
   },
   "jest": {
     "setupFilesAfterEnv": [
@@ -82,9 +82,9 @@
     "version": "manual-git-changelog onversion"
   },
   "dependencies": {
-    "@rdfjs/types": "*",
     "hash.js": "^1.1.7",
-    "rdf-string": "^1.6.0",
-    "rdf-terms": "^1.7.0"
-  }
+    "rdf-string": "^2.0.0",
+    "rdf-terms": "^2.0.0"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
