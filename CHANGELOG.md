@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.0"></a>
+## [v2.0.0](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.3.1...v2.0.0) - 2025-01-08
+
+### ### BREAKING CHANGES
+* [Update to rdf-data-factory v2](https://github.com/rubensworks/rdf-isomorphic.js/commit/bae43f6c07c5716cee0f4b45cb15b98090119193)
+    This includes a bump to @rdfjs/types@2.0.0, which requires TypeScript 5 and Node 14+
+
 <a name="v1.3.1"></a>
 ## [v1.3.1](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.3.0...v1.3.1) - 2022-11-09
 
