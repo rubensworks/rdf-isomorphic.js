@@ -82,7 +82,7 @@
     "version": "manual-git-changelog onversion"
   },
   "dependencies": {
-    "hash.js": "^1.1.7",
+    "imurmurhash": "^0.1.4",
     "rdf-string": "^2.0.0",
     "rdf-terms": "^2.0.0"
   },

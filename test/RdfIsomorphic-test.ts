@@ -10,7 +10,7 @@ import {
   isomorphic,
   isTermGrounded,
   quadToSignature,
-  sha1hex,
+  hashNumber,
   termToSignature, uniqGraph,
 } from "../lib/RdfIsomorphic";
 // tslint:disable-next-line:no-var-requires
@@ -715,10 +715,10 @@ describe('hashTerms', () => {
       DF.blankNode('abc'),
     ], {})).toEqual([
       {
-        '_:abc': sha1hex('@self|@self|@self|'),
+        '_:abc': hashNumber('@self|@self|@self|'),
       },
       {
-        '_:abc': sha1hex('@self|@self|@self|'),
+        '_:abc': hashNumber('@self|@self|@self|'),
       },
     ]);
   });
@@ -739,10 +739,10 @@ describe('hashTerms', () => {
       DF.blankNode('abc'),
     ], {})).toEqual([
       {
-        '_:abc': sha1hex('@self|def1|ghi2|@self|def2|ghi2|'),
+        '_:abc': hashNumber('@self|def1|ghi2|@self|def2|ghi2|'),
       },
       {
-        '_:abc': sha1hex('@self|def1|ghi2|@self|def2|ghi2|'),
+        '_:abc': hashNumber('@self|def1|ghi2|@self|def2|ghi2|'),
       },
     ]);
   });
@@ -763,10 +763,10 @@ describe('hashTerms', () => {
       DF.blankNode('abc1'),
     ], {})).toEqual([
       {
-        '_:abc1': sha1hex('@self|def1|ghi2|'),
+        '_:abc1': hashNumber('@self|def1|ghi2|'),
       },
       {
-        '_:abc1': sha1hex('@self|def1|ghi2|'),
+        '_:abc1': hashNumber('@self|def1|ghi2|'),
       },
     ]);
   });
@@ -795,10 +795,10 @@ describe('hashTerms', () => {
       DF.blankNode('abc'),
     ], {})).toEqual([
       {
-        '_:abc': sha1hex('<@self|def1|ghi2|>|def|ghi|<@self|def2|ghi2|>|def|ghi|'),
+        '_:abc': hashNumber('<@self|def1|ghi2|>|def|ghi|<@self|def2|ghi2|>|def|ghi|'),
       },
       {
-        '_:abc': sha1hex('<@self|def1|ghi2|>|def|ghi|<@self|def2|ghi2|>|def|ghi|'),
+        '_:abc': hashNumber('<@self|def1|ghi2|>|def|ghi|<@self|def2|ghi2|>|def|ghi|'),
       },
     ]);
   });
@@ -827,10 +827,10 @@ describe('hashTerms', () => {
       DF.blankNode('abc1'),
     ], {})).toEqual([
       {
-        '_:abc1': sha1hex('<@self|def1|ghi2|>|def|ghi|'),
+        '_:abc1': hashNumber('<@self|def1|ghi2|>|def|ghi|'),
       },
       {
-        '_:abc1': sha1hex('<@self|def1|ghi2|>|def|ghi|'),
+        '_:abc1': hashNumber('<@self|def1|ghi2|>|def|ghi|'),
       },
     ]);
   });
@@ -844,7 +844,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('def'),
       ),
-    ], {})).toEqual([true, sha1hex('')]);
+    ], {})).toEqual([true, hashNumber('')]);
   });
 
   it('should create grounded hashes for a single quad with equal terms', () => {
@@ -854,7 +854,7 @@ describe('hashTerm', () => {
         DF.namedNode('abc'),
         DF.namedNode('abc'),
       ),
-    ], {})).toEqual([true, sha1hex('@self|@self|@self|')]);
+    ], {})).toEqual([true, hashNumber('@self|@self|@self|')]);
   });
 
   it('should create grounded hashes for a single quad with different terms', () => {
@@ -864,7 +864,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([true, sha1hex('@self|def|ghi|')]);
+    ], {})).toEqual([true, hashNumber('@self|def|ghi|')]);
   });
 
   it('should create grounded hashes for a single quad that has the a blank node that is not hashed', () => {
@@ -874,7 +874,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([true, sha1hex('@self|def|ghi|')]);
+    ], {})).toEqual([true, hashNumber('@self|def|ghi|')]);
   });
 
   it('should create grounded hashes for a single quad with an external blank node', () => {
@@ -884,7 +884,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([true, sha1hex('')]);
+    ], {})).toEqual([true, hashNumber('')]);
   });
 
   it('should create ungrounded hashes for a single quad with the blank node that is not hashed but also ' +
@@ -895,7 +895,7 @@ describe('hashTerm', () => {
         DF.blankNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([false, sha1hex('@self|@blank|ghi|')]);
+    ], {})).toEqual([false, hashNumber('@self|@blank|ghi|')]);
   });
 
   it('should create ungrounded hashes for a two quads with the same blank node that is not hashed but also ' +
@@ -911,7 +911,7 @@ describe('hashTerm', () => {
         DF.blankNode('def2'),
         DF.namedNode('ghi2'),
       ),
-    ], {})).toEqual([false, sha1hex('@self|@blank|ghi1|@self|@blank|ghi2|')]);
+    ], {})).toEqual([false, hashNumber('@self|@blank|ghi1|@self|@blank|ghi2|')]);
   });
 
   it('should create ungrounded hashes for a two quads, one with the same blank node, and one with another ' +
@@ -927,7 +927,7 @@ describe('hashTerm', () => {
         DF.blankNode('def2'),
         DF.namedNode('ghi2'),
       ),
-    ], {})).toEqual([false, sha1hex('@self|@blank|ghi1|')]);
+    ], {})).toEqual([false, hashNumber('@self|@blank|ghi1|')]);
   });
 
   it('should create grounded hashes for a single quad with the blank node that is not hashed but also ' +
@@ -938,7 +938,7 @@ describe('hashTerm', () => {
         DF.blankNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], { '_:def': 'DEF' })).toEqual([true, sha1hex('@self|DEF|ghi|')]);
+    ], { '_:def': 123 })).toEqual([true, hashNumber('@self|123|ghi|')]);
   });
 
   it('should create grounded hashes for a single quad2 with the blank node that is not hashed but also ' +
@@ -949,7 +949,7 @@ describe('hashTerm', () => {
         DF.blankNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], { '_:abc': 'ABC' })).toEqual([true, sha1hex('ABC|@self|ghi|')]);
+    ], { '_:abc': 123 })).toEqual([true, hashNumber('123|@self|ghi|')]);
   });
 
   it('should return an empty hash for an unrelated nested quad', () => {
@@ -963,7 +963,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('def'),
       ),
-    ], {})).toEqual([true, sha1hex('')]);
+    ], {})).toEqual([true, hashNumber('')]);
   });
 
   it('should create grounded hashes for a single nested quad with equal terms', () => {
@@ -977,7 +977,7 @@ describe('hashTerm', () => {
         DF.namedNode('abc'),
         DF.namedNode('abc'),
       ),
-    ], {})).toEqual([true, sha1hex('<@self|@self|@self|>|@self|@self|')]);
+    ], {})).toEqual([true, hashNumber('<@self|@self|@self|>|@self|@self|')]);
   });
 
   it('should create grounded hashes for a single nested quad with different terms', () => {
@@ -991,7 +991,7 @@ describe('hashTerm', () => {
         DF.namedNode('abc'),
         DF.namedNode('abc'),
       ),
-    ], {})).toEqual([true, sha1hex('<@self|def|ghi|>|@self|@self|')]);
+    ], {})).toEqual([true, hashNumber('<@self|def|ghi|>|@self|@self|')]);
   });
 
   it('should create grounded hashes for a single nested quad that has the blank node that is not hashed', () => {
@@ -1005,7 +1005,7 @@ describe('hashTerm', () => {
         DF.blankNode('abc'),
         DF.blankNode('abc'),
       ),
-    ], {})).toEqual([true, sha1hex('<@self|def|ghi|>|@self|@self|')]);
+    ], {})).toEqual([true, hashNumber('<@self|def|ghi|>|@self|@self|')]);
   });
 
   it('should create grounded hashes for a single nested quad that has the blank node (only in nested) that is not hashed', () => {
@@ -1019,7 +1019,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([true, sha1hex('<@self|def|ghi|>|def|ghi|')]);
+    ], {})).toEqual([true, hashNumber('<@self|def|ghi|>|def|ghi|')]);
   });
 
   it('should create ungrounded hashes for a single nested quad with the blank node that is not hashed but also ' +
@@ -1034,7 +1034,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([false, sha1hex('<@self|@blank|ghi|>|def|ghi|')]);
+    ], {})).toEqual([false, hashNumber('<@self|@blank|ghi|>|def|ghi|')]);
   });
 
   it('should create ungrounded hashes for a two nested quads with the same blank node that is not hashed but also ' +
@@ -1058,7 +1058,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([false, sha1hex('<@self|@blank|ghi1|>|def|ghi|<@self|@blank|ghi2|>|def|ghi|')]);
+    ], {})).toEqual([false, hashNumber('<@self|@blank|ghi1|>|def|ghi|<@self|@blank|ghi2|>|def|ghi|')]);
   });
 
   it('should create ungrounded hashes for a two nested quads, one with the same blank node, and one with another ' +
@@ -1082,7 +1082,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([false, sha1hex('<@self|@blank|ghi1|>|def|ghi|')]);
+    ], {})).toEqual([false, hashNumber('<@self|@blank|ghi1|>|def|ghi|')]);
   });
 
   it('should create grounded hashes for a single nested quad with the blank node that is not hashed but also ' +
@@ -1097,7 +1097,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], { '_:def': 'DEF' })).toEqual([true, sha1hex('<@self|DEF|ghi|>|def|ghi|')]);
+    ], { '_:def': 123 })).toEqual([true, hashNumber('<@self|123|ghi|>|def|ghi|')]);
   });
 
   it('should create grounded hashes for a single nested quad2 with the blank node that is not hashed but also ' +
@@ -1112,13 +1112,13 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], { '_:abc': 'ABC' })).toEqual([true, sha1hex('<ABC|@self|ghi|>|def|ghi|')]);
+    ], { '_:abc': 123 })).toEqual([true, hashNumber('<123|@self|ghi|>|def|ghi|')]);
   });
 });
 
-describe('sha1hex', () => {
+describe('hashNumber', () => {
   it('should create hashes', () => {
-    expect(sha1hex('aaa')).toEqual('7e240de74fb1ed08fa08d38063f6a6a91462a815');
+    expect(hashNumber('aaa')).toEqual(3033554871);
   });
 });
 
@@ -1129,7 +1129,7 @@ describe('quadToSignature', () => {
       DF.namedNode('pred'),
       DF.blankNode('abc'),
       DF.defaultGraph(),
-    ), { '_:abc': 'aaa' }, DF.namedNode('abc'))).toEqual('@self|pred|aaa|');
+    ), { '_:abc': 123 }, DF.namedNode('abc'))).toEqual('@self|pred|123|');
   });
 });
 
@@ -1151,8 +1151,8 @@ describe('termToSignature', () => {
   });
 
   it('should be the hash for non-equal blank terms that are hashed yet', () => {
-    return expect(termToSignature(DF.blankNode('abc'), { '_:abc': 'aaa' }, DF.blankNode('def')))
-      .toEqual('aaa');
+    return expect(termToSignature(DF.blankNode('abc'), { '_:abc': 123 }, DF.blankNode('def')))
+      .toEqual('123');
   });
 
   it('should be @self for equal quads', () => {
@@ -1203,12 +1203,12 @@ describe('termToSignature', () => {
       DF.namedNode('p'),
       DF.blankNode('abc'),
       DF.namedNode('g'),
-    ), { '_:abc': 'aaa' }, DF.quad(
+    ), { '_:abc': 123 }, DF.quad(
       DF.namedNode('s2'),
       DF.namedNode('p2'),
       DF.namedNode('o2'),
       DF.namedNode('g2'),
-    ))).toEqual('<s|p|aaa|g>');
+    ))).toEqual('<s|p|123|g>');
   });
 });
 
@@ -1230,11 +1230,11 @@ describe('isTermGrounded', () => {
   });
 
   it('should be false for blank nodes that are not included in the hash', () => {
-    return expect(isTermGrounded(DF.blankNode('abc'), { xyz: 'aaa' })).toBeFalsy();
+    return expect(isTermGrounded(DF.blankNode('abc'), { xyz: 123 })).toBeFalsy();
   });
 
   it('should be true for blank nodes that are included in the hash', () => {
-    return expect(isTermGrounded(DF.blankNode('abc'), { '_:abc': 'aaa' })).toBeTruthy();
+    return expect(isTermGrounded(DF.blankNode('abc'), { '_:abc': 123 })).toBeTruthy();
   });
 
   it('should be true for nested quads without blank nodes', () => {
@@ -1262,7 +1262,7 @@ describe('isTermGrounded', () => {
       DF.namedNode('p'),
       DF.namedNode('o'),
       DF.namedNode('g'),
-    ), { xyz: 'aaa' })).toBeFalsy();
+    ), { xyz: 123 })).toBeFalsy();
   });
 
   it('should be false for nested quads with multiple blank nodes not included in the hash', () => {
@@ -1276,7 +1276,7 @@ describe('isTermGrounded', () => {
       DF.namedNode('p'),
       DF.blankNode('def'),
       DF.namedNode('g'),
-    ), { xyz: 'aaa' })).toBeFalsy();
+    ), { xyz: 123 })).toBeFalsy();
   });
 
   it('should be true for nested quads with a blank node included in the hash', () => {
@@ -1290,7 +1290,7 @@ describe('isTermGrounded', () => {
       DF.namedNode('p'),
       DF.namedNode('o'),
       DF.namedNode('g'),
-    ), { '_:abc': 'aaa' })).toBeTruthy();
+    ), { '_:abc': 123 })).toBeTruthy();
   });
 
   it('should be true for nested quads with multiple blank nodes included in the hash', () => {
@@ -1304,7 +1304,7 @@ describe('isTermGrounded', () => {
       DF.namedNode('p'),
       DF.blankNode('def'),
       DF.namedNode('g'),
-    ), { '_:abc': 'aaa', '_:def': 'aaa' })).toBeTruthy();
+    ), { '_:abc': 123, '_:def': 123 })).toBeTruthy();
   });
 
   it('should be false for nested quads with multiple nested blank nodes not included in the hash', () => {
@@ -1318,7 +1318,7 @@ describe('isTermGrounded', () => {
       DF.namedNode('p'),
       DF.namedNode('o'),
       DF.namedNode('g'),
-    ), { '_:abc': 'aaa' })).toBeFalsy();
+    ), { '_:abc': 123 })).toBeFalsy();
   });
 
   it('should be true for nested quads with multiple nested blank nodes included in the hash', () => {
@@ -1332,6 +1332,6 @@ describe('isTermGrounded', () => {
       DF.namedNode('p'),
       DF.namedNode('o'),
       DF.namedNode('g'),
-    ), { '_:abc': 'aaa', '_:def': 'aaa' })).toBeTruthy();
+    ), { '_:abc': 123, '_:def': 123 })).toBeTruthy();
   });
 });

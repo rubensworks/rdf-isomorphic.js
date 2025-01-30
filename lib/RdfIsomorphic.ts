@@ -1,7 +1,9 @@
-import {sha1} from "hash.js";
 import * as RDF from "@rdfjs/types";
 import {quadToStringQuad, stringQuadToQuad, termToString} from "rdf-string";
 import {everyTerms, getBlankNodes, getTerms, someTerms, uniqTerms, getTermsNested} from "rdf-terms";
+
+// tslint:disable-next-line:no-var-requires
+const MurmurHash3 = require('imurmurhash');
 
 /**
  * Determines if the two given graphs are isomorphic.
@@ -75,7 +77,7 @@ export function getBijectionInner<Q extends RDF.BaseQuad = RDF.Quad>(
   let bijection: IBijection = {};
   for (const blankNodeA of blankNodesA) {
     const blankNodeAString: string = termToString(blankNodeA);
-    const blankNodeAHash: string = ungroundedHashesA[blankNodeAString];
+    const blankNodeAHash: number = ungroundedHashesA[blankNodeAString];
     for (const blankNodeBString in ungroundedHashesB) {
       if (ungroundedHashesB[blankNodeBString] === blankNodeAHash) {
         bijection[blankNodeAString] = blankNodeBString;
@@ -102,7 +104,7 @@ export function getBijectionInner<Q extends RDF.BaseQuad = RDF.Quad>(
           const blankNodeBString: string = termToString(blankNodeB);
           if (!hashesB[blankNodeBString]) {
             if (ungroundedHashesA[blankNodeAString] === ungroundedHashesB[blankNodeBString]) {
-              const hash: string = sha1hex(blankNodeAString);
+              const hash: number = hashNumber(blankNodeAString);
               bijection = getBijectionInner(blankQuadsA, blankQuadsB, blankNodesA, blankNodesB,
                 { ...hashesA, [blankNodeAString]: hash }, { ...hashesB, [blankNodeBString]: hash });
             }
@@ -254,17 +256,16 @@ export function hashTerms<Q extends RDF.BaseQuad = RDF.Quad>(quads: Q[], terms: 
     }
 
     // All terms that have a unique hash at this point can be marked as grounded
-    const uniques: {[term: string]: string | boolean} = {};
+    const uniques: Map<number, string | boolean> = new Map();
     for (const termKey in ungroundedHashes) {
       const hash = ungroundedHashes[termKey];
-      if (uniques[hash] === undefined) {
-        uniques[hash] = termKey;
+      if (uniques.get(hash) === undefined) {
+        uniques.set(hash, termKey);
       } else {
-        uniques[hash] = false;
+        uniques.set(hash, false);
       }
     }
-    for (const hash in uniques) {
-      const value = uniques[hash];
+    for (const [ hash, value ] of uniques.entries()) {
       if (value) {
         hashes[<string> value] = hash;
       }
@@ -290,10 +291,10 @@ export function hashTerms<Q extends RDF.BaseQuad = RDF.Quad>(quads: Q[], terms: 
  * @param {Term} term The term to get the hash around.
  * @param {Quad[]} quads The quads to include in the hashing.
  * @param {ITermHash} hashes A grounded term hash object.
- * @return {[boolean , string]} A tuple indicating if the given term is grounded in all the given quads, and the hash.
+ * @return {[boolean , number]} A tuple indicating if the given term is grounded in all the given quads, and the hash.
  */
 export function hashTerm<Q extends RDF.BaseQuad = RDF.Quad>(term: RDF.Term, quads: Q[], hashes: ITermHash):
-  [boolean, string] {
+  [boolean, number] {
   const quadSignatures = [];
   let grounded: boolean = true;
   for (const quad of quads) {
@@ -307,17 +308,17 @@ export function hashTerm<Q extends RDF.BaseQuad = RDF.Quad>(term: RDF.Term, quad
       }
     }
   }
-  const hash: string = sha1hex(quadSignatures.sort().join(''));
+  const hash: number = hashNumber(quadSignatures.sort().join(''));
   return [ grounded, hash ];
 }
 
 /**
- * Create a hash using sha1 as a hex digest.
- * @param {string | Buffer | NodeJS.TypedArray | DataView} data Something to hash.
+ * Create a number hash.
+ * @param {string} data Something to hash.
  * @return {string} A hash string.
  */
-export function sha1hex(data: string | Buffer | NodeJS.TypedArray | DataView): string {
-  return sha1().update(data).digest('hex');
+export function hashNumber(data: string): number {
+  return MurmurHash3().hash(data).result();
 }
 
 /**
@@ -342,7 +343,7 @@ export function termToSignature(term: RDF.Term, hashes: ITermHash, target: RDF.T
   if (term.equals(target)) {
     return '@self';
   } else if (term.termType === 'BlankNode') {
-    return hashes[termToString(term)] || '@blank';
+    return hashes[termToString(term)]?.toString() || '@blank';
   } else if (term.termType === 'Quad') {
     return `<${quadToSignature(term, hashes, target)}>`;
   } else {
@@ -368,7 +369,7 @@ export function isTermGrounded(term: RDF.Term, hashes: ITermHash): boolean {
 }
 
 export interface ITermHash {
-  [term: string]: string;
+  [term: string]: number;
 }
 
 export interface IBijection {
