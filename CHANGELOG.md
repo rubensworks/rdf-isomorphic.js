@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.1"></a>
+## [v2.0.1](https://github.com/rubensworks/rdf-isomorphic.js/compare/v2.0.0...v2.0.1) - 2025-01-30
+
+### Changed
+* [Improve performance with more efficient hashing](https://github.com/rubensworks/rdf-isomorphic.js/commit/c4c7c72aee69fc6d9d87286b8e2401cf2fb163b6)
+
 <a name="v2.0.0"></a>
 ## [v2.0.0](https://github.com/rubensworks/rdf-isomorphic.js/compare/v1.3.1...v2.0.0) - 2025-01-08
 
