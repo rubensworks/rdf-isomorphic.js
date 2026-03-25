@@ -24,7 +24,7 @@ export function isomorphic<Q extends RDF.BaseQuad = RDF.Quad>(graphA: Q[], graph
  * @param {Quad[]} graphB An array of quads, order is not important.
  * @return {IBijection} A hash representing a bijection, or null if none could be found.
  */
-export function getBijection<Q extends RDF.BaseQuad = RDF.Quad>(graphA: Q[], graphB: Q[]): IBijection {
+export function getBijection<Q extends RDF.BaseQuad = RDF.Quad>(graphA: Q[], graphB: Q[]): IBijection | null {
   // Check if all (non-blanknode-containing) quads in the two graphs are equal.
   // We do this by creating a hash-based index for both graphs.
   const nonBlankIndexA: {[quad: string]: boolean} = indexGraph(getQuadsWithoutBlankNodes(graphA));
@@ -49,7 +49,7 @@ export function getBijection<Q extends RDF.BaseQuad = RDF.Quad>(graphA: Q[], gra
 
 export function getBijectionInner<Q extends RDF.BaseQuad = RDF.Quad>(
   blankQuadsA: Q[], blankQuadsB: Q[], blankNodesA: RDF.BlankNode[], blankNodesB: RDF.BlankNode[],
-  groundedHashesA?: ITermHash, groundedHashesB?: ITermHash): IBijection {
+  groundedHashesA?: ITermHash, groundedHashesB?: ITermHash): IBijection | null {
   if (!groundedHashesA) {
     groundedHashesA = {};
   }
@@ -74,7 +74,7 @@ export function getBijectionInner<Q extends RDF.BaseQuad = RDF.Quad>(
   // Map the blank nodes from graph A to the blank nodes of graph B using the created hashes.
   // Grounded hashes will also be equal, but not needed here, we will need them in the next recursion
   // (as we only recurse on grounded nodes).
-  let bijection: IBijection = {};
+  let bijection: IBijection | null = {};
   for (const blankNodeA of blankNodesA) {
     const blankNodeAString: string = termToString(blankNodeA);
     const blankNodeAHash: number = ungroundedHashesA[blankNodeAString];
