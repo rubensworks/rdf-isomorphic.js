@@ -8,7 +8,6 @@
       "dom"
     ],
     "module": "commonjs",
-    "esModuleInterop": true,
     "types": ["node", "jest"],
     "noImplicitAny": true,
     "declaration": true,
@@ -16,7 +15,8 @@
     "inlineSources": true,
     "preserveConstEnums": true,
     "removeComments": false,
-    "sourceMap": true
+    "sourceMap": true,
+    "esModuleInterop": true
   },
   "include": [
     "index.ts",

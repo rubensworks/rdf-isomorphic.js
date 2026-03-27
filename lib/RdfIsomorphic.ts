@@ -1,8 +1,8 @@
 import type * as RDF from '@rdfjs/types';
-import { quadToStringQuad, stringQuadToQuad, termToString, IStringQuad } from 'rdf-string';
-import { everyTerms, getBlankNodes, getTerms, someTerms, uniqTerms, getTermsNested } from 'rdf-terms';
-
 import murmurHash3 from 'imurmurhash';
+import type { IStringQuad } from 'rdf-string';
+import { quadToStringQuad, stringQuadToQuad, termToString } from 'rdf-string';
+import { everyTerms, getBlankNodes, getTerms, someTerms, uniqTerms, getTermsNested } from 'rdf-terms';
 
 /**
  * Determines if the two given graphs are isomorphic.
@@ -93,10 +93,11 @@ export function getBijectionInner<TQ extends RDF.BaseQuad = RDF.Quad>(
 
   // Check if all nodes from graph A and B are present in the bijection,
   // if not, speculatively mark pairs with matching ungrounded hashes as bijected, and recurse.
-  if (!arraysEqual(Object.keys(bijection).sort((a, b) => a.localeCompare(b)),
-    blankNodesA.map(termToString).sort((a, b) => a.localeCompare(b))) ||
-    !arraysEqual(hashValues(bijection).sort((a, b) => a.localeCompare(b)),
-      blankNodesB.map(termToString).sort((a, b) => a.localeCompare(b)))) {
+  const bijectionA: string[] = Object.keys(bijection).sort((a, b) => a.localeCompare(b));
+  const bijectionB: string[] = hashValues(bijection).sort((a, b) => a.localeCompare(b));
+  const nodesA: string[] = blankNodesA.map(termToString).sort((a, b) => a.localeCompare(b));
+  const nodesB: string[] = blankNodesB.map(termToString).sort((a, b) => a.localeCompare(b));
+  if (!arraysEqual(bijectionA, nodesA) || !arraysEqual(bijectionB, nodesB)) {
     // I have not yet been able to find any pathological cases where this code is reached.
     // This may be removable, but let's wait until someone proves that.
     bijection = null;
@@ -156,7 +157,7 @@ export function hashValues(hash: IBijection): string[] {
  * @param {string} value A value.
  * @return {boolean} If it contains the value.
  */
-export function hasValue(hash: ITermHash, value: number): boolean {
+export function hasValue<TValue>(hash: Record<string, TValue>, value: TValue): boolean {
   for (const hashValue in hash) {
     if (hash[hashValue] === value) {
       return true;
@@ -204,7 +205,7 @@ export function indexGraph<TQ extends RDF.BaseQuad = RDF.Quad>(graph: TQ[]): Rec
  * @return {Quad[]} An array of quads, the order does not matter.
  */
 export function deindexGraph<TQ extends RDF.BaseQuad = RDF.Quad>(indexedGraph: Record<string, boolean>): TQ[] {
-  return Object.keys(indexedGraph).map(str => stringQuadToQuad(JSON.parse(str) as IStringQuad));
+  return Object.keys(indexedGraph).map(str => stringQuadToQuad(<IStringQuad>JSON.parse(str)));
 }
 
 /**
@@ -236,8 +237,11 @@ export function getGraphBlankNodes<TQ extends RDF.BaseQuad = RDF.Quad>(graph: TQ
  *                                   of other terms, because they are based on non-blank nodes and grounded blank nodes.
  * @return {[ITermHash]} A tuple of grounded and ungrounded hashes.
  */
-export function hashTerms<TQ extends RDF.BaseQuad = RDF.Quad>(quads: TQ[], terms: RDF.Term[], groundedHashes: ITermHash):
-[ITermHash, ITermHash] {
+export function hashTerms<TQ extends RDF.BaseQuad = RDF.Quad>(
+  quads: TQ[],
+  terms: RDF.Term[],
+  groundedHashes: ITermHash,
+): [ITermHash, ITermHash] {
   const hashes: ITermHash = { ...groundedHashes };
   const ungroundedHashes: ITermHash = {};
   let hashNeeded = true;
@@ -330,7 +334,11 @@ export function hashNumber(data: string): number {
  * @param {Term} term A target term to compare with.
  * @return {string} A string signature.
  */
-export function quadToSignature<TQ extends RDF.BaseQuad = RDF.Quad>(quad: TQ, hashes: ITermHash, term: RDF.Term): string {
+export function quadToSignature<TQ extends RDF.BaseQuad = RDF.Quad>(
+  quad: TQ,
+  hashes: ITermHash,
+  term: RDF.Term,
+): string {
   return getTerms(quad).map((quadTerm: RDF.Term) => termToSignature(quadTerm, hashes, term)).join('|');
 }
 
@@ -344,9 +352,11 @@ export function quadToSignature<TQ extends RDF.BaseQuad = RDF.Quad>(quad: TQ, ha
 export function termToSignature(term: RDF.Term, hashes: ITermHash, target: RDF.Term): string {
   if (term.equals(target)) {
     return '@self';
-  } else if (term.termType === 'BlankNode') {
+  }
+  if (term.termType === 'BlankNode') {
     return hashes[termToString(term)]?.toString() || '@blank';
-  } else if (term.termType === 'Quad') {
+  }
+  if (term.termType === 'Quad') {
     return `<${quadToSignature(term, hashes, target)}>`;
   }
   return termToString(term);

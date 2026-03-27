@@ -1,4 +1,5 @@
 import { createReadStream, readdirSync } from 'node:fs';
+import path from 'node:path';
 import type * as RDF from '@rdfjs/types';
 import { StreamParser } from 'n3';
 import { DataFactory } from 'rdf-data-factory';
@@ -26,8 +27,10 @@ const arrayifyStream = require('arrayify-stream');
 const DF = new DataFactory<RDF.BaseQuad>();
 
 describe('isomorphic', () => {
-  loadIsomorphicFiles(`${__dirname}/assets/isomorphic/`, true);
-  loadIsomorphicFiles(`${__dirname}/assets/non_isomorphic/`, false);
+  const pathIsomorphic = path.join(__dirname, 'assets', 'isomorphic');
+  const pathNonIsomorphic = path.join(__dirname, 'assets', 'non_isomorphic');
+  loadIsomorphicFiles(pathIsomorphic, true);
+  loadIsomorphicFiles(pathNonIsomorphic, false);
 
   describe('for pathological cases', () => {
     /* These cases are not possible in practise, as RDF does not allow blank predicates. */
@@ -181,14 +184,19 @@ describe('isomorphic', () => {
   });
 });
 
-function loadIsomorphicFiles(path: string, expected: boolean) {
-  for (const subDir of readdirSync(path)) {
-    test(subDir + (expected ? ' should contain isomorphic graphs' : ' should contain non-isomorphic graphs'), async() => {
-      const graphA = await loadGraph(`${path + subDir}/${subDir}-1.nq`);
-      const graphB = await loadGraph(`${path + subDir}/${subDir}-2.nq`);
-      expect(isomorphic(graphA, graphB)).toBe(expected);
-    });
-  }
+function loadIsomorphicFiles(pathDir: string, expected: boolean) {
+  const subDirs: string[] = readdirSync(pathDir);
+  describe(pathDir, () => {
+    it.each(subDirs)(
+      `%s${expected ? ' should contain isomorphic graphs' : ' should contain non-isomorphic graphs'}`,
+      async(subDir: string) => {
+        const pathTest = path.join(pathDir, subDir);
+        const graphA = await loadGraph(path.join(pathTest, `${subDir}-1.nq`));
+        const graphB = await loadGraph(path.join(pathTest, `${subDir}-2.nq`));
+        expect(isomorphic(graphA, graphB)).toBe(expected);
+      },
+    );
+  });
 }
 
 function loadGraph(file: string): Promise<RDF.Quad[]> {
@@ -1014,7 +1022,7 @@ describe('hashTerm', () => {
     ], {})).toEqual([ true, hashNumber('<@self|def|ghi|>|@self|@self|') ]);
   });
 
-  it('should create grounded hashes for a single nested quad that has the blank node (only in nested) that is not hashed', () => {
+  it('should create grounded hashes for single nested quad where blank node in nested is not hashed', () => {
     expect(hashTerm(DF.blankNode('abc'), [
       DF.quad(
         DF.quad(
