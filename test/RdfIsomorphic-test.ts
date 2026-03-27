@@ -186,7 +186,7 @@ describe('isomorphic', () => {
 
 function loadIsomorphicFiles(pathDir: string, expected: boolean) {
   const subDirs: string[] = readdirSync(pathDir);
-  describe(pathDir, () => {
+  describe(expected ? 'isomorphic datasets' : 'non-isomorphic datasets', () => {
     it.each(subDirs)(
       `%s${expected ? ' should contain isomorphic graphs' : ' should contain non-isomorphic graphs'}`,
       async(subDir: string) => {

@@ -157,7 +157,7 @@ export function hashValues(hash: IBijection): string[] {
  * @param {string} value A value.
  * @return {boolean} If it contains the value.
  */
-export function hasValue<TValue>(hash: Record<string, TValue>, value: TValue): boolean {
+export function hasValue(hash: Record<string, number | string>, value: number | string): boolean {
   for (const hashValue in hash) {
     if (hash[hashValue] === value) {
       return true;
