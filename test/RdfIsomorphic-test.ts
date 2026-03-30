@@ -1,26 +1,36 @@
-import { DataFactory } from "rdf-data-factory";
-import {createReadStream, readdirSync} from "fs";
-import {StreamParser} from 'n3';
-import * as RDF from "@rdfjs/types";
+import { createReadStream, readdirSync } from 'node:fs';
+import path from 'node:path';
+import type * as RDF from '@rdfjs/types';
+import { StreamParser } from 'n3';
+import { DataFactory } from 'rdf-data-factory';
 import {
   deindexGraph,
-  getGraphBlankNodes, getQuadsWithBlankNodes, getQuadsWithoutBlankNodes,
+  getGraphBlankNodes,
+  getQuadsWithBlankNodes,
+  getQuadsWithoutBlankNodes,
   hashTerm,
-  hashTerms, hashValues, hasValue, indexGraph,
+  hashTerms,
+  hashValues,
+  hasValue,
+  indexGraph,
   isomorphic,
   isTermGrounded,
   quadToSignature,
   hashNumber,
-  termToSignature, uniqGraph,
-} from "../lib/RdfIsomorphic";
-// tslint:disable-next-line:no-var-requires
+  termToSignature,
+  uniqGraph,
+} from '../lib/RdfIsomorphic';
+
+// Tslint:disable-next-line:no-var-requires
 const arrayifyStream = require('arrayify-stream');
 
 const DF = new DataFactory<RDF.BaseQuad>();
 
 describe('isomorphic', () => {
-  loadIsomorphicFiles(__dirname + '/assets/isomorphic/', true);
-  loadIsomorphicFiles(__dirname + '/assets/non_isomorphic/', false);
+  const pathIsomorphic = path.join(__dirname, 'assets', 'isomorphic');
+  const pathNonIsomorphic = path.join(__dirname, 'assets', 'non_isomorphic');
+  loadIsomorphicFiles(pathIsomorphic, true);
+  loadIsomorphicFiles(pathNonIsomorphic, false);
 
   describe('for pathological cases', () => {
     /* These cases are not possible in practise, as RDF does not allow blank predicates. */
@@ -39,7 +49,7 @@ describe('isomorphic', () => {
           DF.blankNode('c2'),
         ),
       ];
-      return expect(isomorphic(graphA, graphB)).toBe(true);
+      expect(isomorphic(graphA, graphB)).toBe(true);
     });
 
     it('should be isomorphic for 2 graphs with two unconnected full-blank triples', () => {
@@ -67,7 +77,7 @@ describe('isomorphic', () => {
           DF.blankNode('f2'),
         ),
       ];
-      return expect(isomorphic(graphA, graphB)).toBe(true);
+      expect(isomorphic(graphA, graphB)).toBe(true);
     });
 
     it('should be isomorphic for 2 graphs with two connected full-blank triples', () => {
@@ -95,7 +105,7 @@ describe('isomorphic', () => {
           DF.blankNode('f2'),
         ),
       ];
-      return expect(isomorphic(graphA, graphB)).toBe(true);
+      expect(isomorphic(graphA, graphB)).toBe(true);
     });
 
     it('should be isomorphic for 2 graphs with two connected partially-blank triples', () => {
@@ -123,7 +133,7 @@ describe('isomorphic', () => {
           DF.blankNode('f2'),
         ),
       ];
-      return expect(isomorphic(graphA, graphB)).toBe(true);
+      expect(isomorphic(graphA, graphB)).toBe(true);
     });
 
     it('should be isomorphic for 2 equal graphs where one contains duplicates', () => {
@@ -151,7 +161,7 @@ describe('isomorphic', () => {
           DF.blankNode('c2'),
         ),
       ];
-      return expect(isomorphic(graphA, graphB)).toBe(true);
+      expect(isomorphic(graphA, graphB)).toBe(true);
     });
 
     it('should not be isomorphic for 2 graphs with single full-blank triples', () => {
@@ -169,20 +179,24 @@ describe('isomorphic', () => {
           DF.blankNode('c2'),
         ),
       ];
-      return expect(isomorphic(graphA, graphB)).toBe(false);
+      expect(isomorphic(graphA, graphB)).toBe(false);
     });
   });
 });
 
-function loadIsomorphicFiles(path: string, expected: boolean) {
-  for (const subDir of readdirSync(path)) {
-    it(subDir + (expected ? ' should contain isomorphic graphs' : ' should contain non-isomorphic graphs'),
-      async () => {
-        const graphA = await loadGraph(path + subDir + '/' + subDir + '-1.nq');
-        const graphB = await loadGraph(path + subDir + '/' + subDir + '-2.nq');
-        return expect(isomorphic(graphA, graphB)).toBe(expected);
-      });
-  }
+function loadIsomorphicFiles(pathDir: string, expected: boolean) {
+  const subDirs: string[] = readdirSync(pathDir);
+  describe(expected ? 'isomorphic datasets' : 'non-isomorphic datasets', () => {
+    it.each(subDirs)(
+      `%s${expected ? ' should contain isomorphic graphs' : ' should contain non-isomorphic graphs'}`,
+      async(subDir: string) => {
+        const pathTest = path.join(pathDir, subDir);
+        const graphA = await loadGraph(path.join(pathTest, `${subDir}-1.nq`));
+        const graphB = await loadGraph(path.join(pathTest, `${subDir}-2.nq`));
+        expect(isomorphic(graphA, graphB)).toBe(expected);
+      },
+    );
+  });
 }
 
 function loadGraph(file: string): Promise<RDF.Quad[]> {
@@ -191,11 +205,11 @@ function loadGraph(file: string): Promise<RDF.Quad[]> {
 
 describe('hashValues', () => {
   it('should return an empty array for an empty hash', () => {
-    return expect(hashValues({})).toEqual([]);
+    expect(hashValues({})).toEqual([]);
   });
 
   it('should return a non-empty array for a non-empty hash', () => {
-    return expect(hashValues({
+    expect(hashValues({
       0: 'aa',
       11: 'bb',
       22: 'cc',
@@ -209,18 +223,18 @@ describe('hashValues', () => {
 
 describe('hasValue', () => {
   it('should false for an empty hash', () => {
-    return expect(hasValue({}, 'aa')).toBeFalsy();
+    expect(hasValue({}, 'aa')).toBeFalsy();
   });
 
   it('should false for a hash without the given value', () => {
-    return expect(hasValue({
+    expect(hasValue({
       11: 'bb',
       22: 'cc',
     }, 'aa')).toBeFalsy();
   });
 
   it('should true for a hash with the given value', () => {
-    return expect(hasValue({
+    expect(hasValue({
       0: 'aa',
       11: 'bb',
       22: 'cc',
@@ -230,11 +244,11 @@ describe('hasValue', () => {
 
 describe('getQuadsWithBlankNodes', () => {
   it('should return an empty array for an empty graph', () => {
-    return expect(getQuadsWithBlankNodes([])).toEqual([]);
+    expect(getQuadsWithBlankNodes([])).toEqual([]);
   });
 
   it('should return an the correct quads for a non-empty graph', () => {
-    return expect(getQuadsWithBlankNodes([
+    expect(getQuadsWithBlankNodes([
       DF.quad(
         DF.namedNode('s1'),
         DF.namedNode('p1'),
@@ -264,7 +278,7 @@ describe('getQuadsWithBlankNodes', () => {
   });
 
   it('should return an the correct quads for nested quads', () => {
-    return expect(getQuadsWithBlankNodes([
+    expect(getQuadsWithBlankNodes([
       DF.quad(
         DF.quad(
           DF.namedNode('s1'),
@@ -337,11 +351,11 @@ describe('getQuadsWithBlankNodes', () => {
 
 describe('getQuadsWithoutBlankNodes', () => {
   it('should return an empty array for an empty graph', () => {
-    return expect(getQuadsWithoutBlankNodes([])).toEqual([]);
+    expect(getQuadsWithoutBlankNodes([])).toEqual([]);
   });
 
   it('should return an the correct quads for a non-empty graph', () => {
-    return expect(getQuadsWithoutBlankNodes([
+    expect(getQuadsWithoutBlankNodes([
       DF.quad(
         DF.namedNode('s1'),
         DF.namedNode('p1'),
@@ -377,7 +391,7 @@ describe('getQuadsWithoutBlankNodes', () => {
   });
 
   it('should return an the correct quads for nested quads', () => {
-    return expect(getQuadsWithoutBlankNodes([
+    expect(getQuadsWithoutBlankNodes([
       DF.quad(
         DF.quad(
           DF.namedNode('s1'),
@@ -434,11 +448,11 @@ describe('getQuadsWithoutBlankNodes', () => {
 
 describe('indexGraph', () => {
   it('should index for an empty graph', () => {
-    return expect(indexGraph([])).toEqual({});
+    expect(indexGraph([])).toEqual({});
   });
 
   it('should index for a graph with one quad', () => {
-    return expect(indexGraph([
+    expect(indexGraph([
       DF.quad(
         DF.namedNode('s1'),
         DF.namedNode('p1'),
@@ -446,12 +460,12 @@ describe('indexGraph', () => {
         DF.namedNode('g1'),
       ),
     ])).toEqual({
-      "{\"subject\":\"s1\",\"predicate\":\"p1\",\"object\":\"o1\",\"graph\":\"g1\"}": true,
+      '{"subject":"s1","predicate":"p1","object":"o1","graph":"g1"}': true,
     });
   });
 
   it('should index for a graph with three quads', () => {
-    return expect(indexGraph([
+    expect(indexGraph([
       DF.quad(
         DF.namedNode('s1'),
         DF.namedNode('p1'),
@@ -471,21 +485,21 @@ describe('indexGraph', () => {
         DF.namedNode('g3'),
       ),
     ])).toEqual({
-      "{\"subject\":\"s1\",\"predicate\":\"p1\",\"object\":\"o1\",\"graph\":\"g1\"}": true,
-      "{\"subject\":\"s2\",\"predicate\":\"p2\",\"object\":\"o2\",\"graph\":\"g2\"}": true,
-      "{\"subject\":\"s3\",\"predicate\":\"p3\",\"object\":\"o3\",\"graph\":\"g3\"}": true,
+      '{"subject":"s1","predicate":"p1","object":"o1","graph":"g1"}': true,
+      '{"subject":"s2","predicate":"p2","object":"o2","graph":"g2"}': true,
+      '{"subject":"s3","predicate":"p3","object":"o3","graph":"g3"}': true,
     });
   });
 });
 
 describe('deindexGraph', () => {
   it('should deindex for an empty graph', () => {
-    return expect(deindexGraph({})).toEqual([]);
+    expect(deindexGraph({})).toEqual([]);
   });
 
   it('should deindex for a graph with one quad', () => {
-    return expect(deindexGraph({
-      "{\"subject\":\"s1\",\"predicate\":\"p1\",\"object\":\"o1\",\"graph\":\"g1\"}": true,
+    expect(deindexGraph({
+      '{"subject":"s1","predicate":"p1","object":"o1","graph":"g1"}': true,
     })).toEqual([
       DF.quad(
         DF.namedNode('s1'),
@@ -497,10 +511,10 @@ describe('deindexGraph', () => {
   });
 
   it('should deindex for a graph with three quads', () => {
-    return expect(deindexGraph({
-      "{\"subject\":\"s1\",\"predicate\":\"p1\",\"object\":\"o1\",\"graph\":\"g1\"}": true,
-      "{\"subject\":\"s2\",\"predicate\":\"p2\",\"object\":\"o2\",\"graph\":\"g2\"}": true,
-      "{\"subject\":\"s3\",\"predicate\":\"p3\",\"object\":\"o3\",\"graph\":\"g3\"}": true,
+    expect(deindexGraph({
+      '{"subject":"s1","predicate":"p1","object":"o1","graph":"g1"}': true,
+      '{"subject":"s2","predicate":"p2","object":"o2","graph":"g2"}': true,
+      '{"subject":"s3","predicate":"p3","object":"o3","graph":"g3"}': true,
     })).toEqual([
       DF.quad(
         DF.namedNode('s1'),
@@ -526,11 +540,11 @@ describe('deindexGraph', () => {
 
 describe('uniqGraph', () => {
   it('should uniqueify for an empty graph', () => {
-    return expect(uniqGraph([])).toEqual([]);
+    expect(uniqGraph([])).toEqual([]);
   });
 
   it('should uniqueify for a graph with one quad', () => {
-    return expect(uniqGraph([
+    expect(uniqGraph([
       DF.quad(
         DF.namedNode('s1'),
         DF.namedNode('p1'),
@@ -548,7 +562,7 @@ describe('uniqGraph', () => {
   });
 
   it('should uniqueify for a graph with two unique quads', () => {
-    return expect(uniqGraph([
+    expect(uniqGraph([
       DF.quad(
         DF.namedNode('s1'),
         DF.namedNode('p1'),
@@ -586,11 +600,11 @@ describe('uniqGraph', () => {
 
 describe('getGraphBlankNodes', () => {
   it('should return an empty array for an empty graph', () => {
-    return expect(getGraphBlankNodes([])).toEqual([]);
+    expect(getGraphBlankNodes([])).toEqual([]);
   });
 
   it('should return an empty array for a graph without blank nodes', () => {
-    return expect(getGraphBlankNodes([
+    expect(getGraphBlankNodes([
       DF.quad(
         DF.namedNode('s1'),
         DF.namedNode('p1'),
@@ -607,7 +621,7 @@ describe('getGraphBlankNodes', () => {
   });
 
   it('should return an non-empty array for a graph with blank nodes', () => {
-    return expect(getGraphBlankNodes([
+    expect(getGraphBlankNodes([
       DF.quad(
         DF.namedNode('s1'),
         DF.namedNode('p1'),
@@ -627,7 +641,7 @@ describe('getGraphBlankNodes', () => {
   });
 
   it('should return an non-empty array for a graph with unique blank nodes', () => {
-    return expect(getGraphBlankNodes([
+    expect(getGraphBlankNodes([
       DF.quad(
         DF.namedNode('s'),
         DF.namedNode('p'),
@@ -646,7 +660,7 @@ describe('getGraphBlankNodes', () => {
   });
 
   it('should return an empty array for a graph with nested quads without blank nodes', () => {
-    return expect(getGraphBlankNodes([
+    expect(getGraphBlankNodes([
       DF.quad(
         DF.quad(
           DF.namedNode('s1'),
@@ -673,7 +687,7 @@ describe('getGraphBlankNodes', () => {
   });
 
   it('should return an empty array for a graph with nested quads with blank nodes', () => {
-    return expect(getGraphBlankNodes([
+    expect(getGraphBlankNodes([
       DF.quad(
         DF.quad(
           DF.namedNode('s1'),
@@ -844,7 +858,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('def'),
       ),
-    ], {})).toEqual([true, hashNumber('')]);
+    ], {})).toEqual([ true, hashNumber('') ]);
   });
 
   it('should create grounded hashes for a single quad with equal terms', () => {
@@ -854,7 +868,7 @@ describe('hashTerm', () => {
         DF.namedNode('abc'),
         DF.namedNode('abc'),
       ),
-    ], {})).toEqual([true, hashNumber('@self|@self|@self|')]);
+    ], {})).toEqual([ true, hashNumber('@self|@self|@self|') ]);
   });
 
   it('should create grounded hashes for a single quad with different terms', () => {
@@ -864,7 +878,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([true, hashNumber('@self|def|ghi|')]);
+    ], {})).toEqual([ true, hashNumber('@self|def|ghi|') ]);
   });
 
   it('should create grounded hashes for a single quad that has the a blank node that is not hashed', () => {
@@ -874,7 +888,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([true, hashNumber('@self|def|ghi|')]);
+    ], {})).toEqual([ true, hashNumber('@self|def|ghi|') ]);
   });
 
   it('should create grounded hashes for a single quad with an external blank node', () => {
@@ -884,7 +898,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([true, hashNumber('')]);
+    ], {})).toEqual([ true, hashNumber('') ]);
   });
 
   it('should create ungrounded hashes for a single quad with the blank node that is not hashed but also ' +
@@ -895,7 +909,7 @@ describe('hashTerm', () => {
         DF.blankNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([false, hashNumber('@self|@blank|ghi|')]);
+    ], {})).toEqual([ false, hashNumber('@self|@blank|ghi|') ]);
   });
 
   it('should create ungrounded hashes for a two quads with the same blank node that is not hashed but also ' +
@@ -911,7 +925,7 @@ describe('hashTerm', () => {
         DF.blankNode('def2'),
         DF.namedNode('ghi2'),
       ),
-    ], {})).toEqual([false, hashNumber('@self|@blank|ghi1|@self|@blank|ghi2|')]);
+    ], {})).toEqual([ false, hashNumber('@self|@blank|ghi1|@self|@blank|ghi2|') ]);
   });
 
   it('should create ungrounded hashes for a two quads, one with the same blank node, and one with another ' +
@@ -927,7 +941,7 @@ describe('hashTerm', () => {
         DF.blankNode('def2'),
         DF.namedNode('ghi2'),
       ),
-    ], {})).toEqual([false, hashNumber('@self|@blank|ghi1|')]);
+    ], {})).toEqual([ false, hashNumber('@self|@blank|ghi1|') ]);
   });
 
   it('should create grounded hashes for a single quad with the blank node that is not hashed but also ' +
@@ -938,7 +952,7 @@ describe('hashTerm', () => {
         DF.blankNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], { '_:def': 123 })).toEqual([true, hashNumber('@self|123|ghi|')]);
+    ], { '_:def': 123 })).toEqual([ true, hashNumber('@self|123|ghi|') ]);
   });
 
   it('should create grounded hashes for a single quad2 with the blank node that is not hashed but also ' +
@@ -949,7 +963,7 @@ describe('hashTerm', () => {
         DF.blankNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], { '_:abc': 123 })).toEqual([true, hashNumber('123|@self|ghi|')]);
+    ], { '_:abc': 123 })).toEqual([ true, hashNumber('123|@self|ghi|') ]);
   });
 
   it('should return an empty hash for an unrelated nested quad', () => {
@@ -963,7 +977,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('def'),
       ),
-    ], {})).toEqual([true, hashNumber('')]);
+    ], {})).toEqual([ true, hashNumber('') ]);
   });
 
   it('should create grounded hashes for a single nested quad with equal terms', () => {
@@ -977,7 +991,7 @@ describe('hashTerm', () => {
         DF.namedNode('abc'),
         DF.namedNode('abc'),
       ),
-    ], {})).toEqual([true, hashNumber('<@self|@self|@self|>|@self|@self|')]);
+    ], {})).toEqual([ true, hashNumber('<@self|@self|@self|>|@self|@self|') ]);
   });
 
   it('should create grounded hashes for a single nested quad with different terms', () => {
@@ -991,7 +1005,7 @@ describe('hashTerm', () => {
         DF.namedNode('abc'),
         DF.namedNode('abc'),
       ),
-    ], {})).toEqual([true, hashNumber('<@self|def|ghi|>|@self|@self|')]);
+    ], {})).toEqual([ true, hashNumber('<@self|def|ghi|>|@self|@self|') ]);
   });
 
   it('should create grounded hashes for a single nested quad that has the blank node that is not hashed', () => {
@@ -1005,10 +1019,10 @@ describe('hashTerm', () => {
         DF.blankNode('abc'),
         DF.blankNode('abc'),
       ),
-    ], {})).toEqual([true, hashNumber('<@self|def|ghi|>|@self|@self|')]);
+    ], {})).toEqual([ true, hashNumber('<@self|def|ghi|>|@self|@self|') ]);
   });
 
-  it('should create grounded hashes for a single nested quad that has the blank node (only in nested) that is not hashed', () => {
+  it('should create grounded hashes for single nested quad where blank node in nested is not hashed', () => {
     expect(hashTerm(DF.blankNode('abc'), [
       DF.quad(
         DF.quad(
@@ -1019,7 +1033,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([true, hashNumber('<@self|def|ghi|>|def|ghi|')]);
+    ], {})).toEqual([ true, hashNumber('<@self|def|ghi|>|def|ghi|') ]);
   });
 
   it('should create ungrounded hashes for a single nested quad with the blank node that is not hashed but also ' +
@@ -1034,7 +1048,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([false, hashNumber('<@self|@blank|ghi|>|def|ghi|')]);
+    ], {})).toEqual([ false, hashNumber('<@self|@blank|ghi|>|def|ghi|') ]);
   });
 
   it('should create ungrounded hashes for a two nested quads with the same blank node that is not hashed but also ' +
@@ -1058,7 +1072,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([false, hashNumber('<@self|@blank|ghi1|>|def|ghi|<@self|@blank|ghi2|>|def|ghi|')]);
+    ], {})).toEqual([ false, hashNumber('<@self|@blank|ghi1|>|def|ghi|<@self|@blank|ghi2|>|def|ghi|') ]);
   });
 
   it('should create ungrounded hashes for a two nested quads, one with the same blank node, and one with another ' +
@@ -1082,7 +1096,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], {})).toEqual([false, hashNumber('<@self|@blank|ghi1|>|def|ghi|')]);
+    ], {})).toEqual([ false, hashNumber('<@self|@blank|ghi1|>|def|ghi|') ]);
   });
 
   it('should create grounded hashes for a single nested quad with the blank node that is not hashed but also ' +
@@ -1097,7 +1111,7 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], { '_:def': 123 })).toEqual([true, hashNumber('<@self|123|ghi|>|def|ghi|')]);
+    ], { '_:def': 123 })).toEqual([ true, hashNumber('<@self|123|ghi|>|def|ghi|') ]);
   });
 
   it('should create grounded hashes for a single nested quad2 with the blank node that is not hashed but also ' +
@@ -1112,51 +1126,51 @@ describe('hashTerm', () => {
         DF.namedNode('def'),
         DF.namedNode('ghi'),
       ),
-    ], { '_:abc': 123 })).toEqual([true, hashNumber('<123|@self|ghi|>|def|ghi|')]);
+    ], { '_:abc': 123 })).toEqual([ true, hashNumber('<123|@self|ghi|>|def|ghi|') ]);
   });
 });
 
 describe('hashNumber', () => {
   it('should create hashes', () => {
-    expect(hashNumber('aaa')).toEqual(3033554871);
+    expect(hashNumber('aaa')).toBe(3033554871);
   });
 });
 
 describe('quadToSignature', () => {
   it('should concat calls to termToSignature for all terms', () => {
-    return expect(quadToSignature(DF.quad(
+    expect(quadToSignature(DF.quad(
       DF.namedNode('abc'),
       DF.namedNode('pred'),
       DF.blankNode('abc'),
       DF.defaultGraph(),
-    ), { '_:abc': 123 }, DF.namedNode('abc'))).toEqual('@self|pred|123|');
+    ), { '_:abc': 123 }, DF.namedNode('abc'))).toBe('@self|pred|123|');
   });
 });
 
 describe('termToSignature', () => {
   it('should be @self for equal terms', () => {
-    return expect(termToSignature(DF.namedNode('abc'), {}, DF.namedNode('abc'))).toEqual('@self');
+    expect(termToSignature(DF.namedNode('abc'), {}, DF.namedNode('abc'))).toBe('@self');
   });
 
   it('should be @self for equal blank terms', () => {
-    return expect(termToSignature(DF.blankNode('abc'), {}, DF.blankNode('abc'))).toEqual('@self');
+    expect(termToSignature(DF.blankNode('abc'), {}, DF.blankNode('abc'))).toBe('@self');
   });
 
   it('should be the node string for non-equal non-blank terms', () => {
-    return expect(termToSignature(DF.namedNode('abc'), {}, DF.namedNode('def'))).toEqual('abc');
+    expect(termToSignature(DF.namedNode('abc'), {}, DF.namedNode('def'))).toBe('abc');
   });
 
   it('should be @blank for non-equal blank terms that are not hashed yet', () => {
-    return expect(termToSignature(DF.blankNode('abc'), {}, DF.blankNode('def'))).toEqual('@blank');
+    expect(termToSignature(DF.blankNode('abc'), {}, DF.blankNode('def'))).toBe('@blank');
   });
 
   it('should be the hash for non-equal blank terms that are hashed yet', () => {
-    return expect(termToSignature(DF.blankNode('abc'), { '_:abc': 123 }, DF.blankNode('def')))
-      .toEqual('123');
+    expect(termToSignature(DF.blankNode('abc'), { '_:abc': 123 }, DF.blankNode('def')))
+      .toBe('123');
   });
 
   it('should be @self for equal quads', () => {
-    return expect(termToSignature(DF.quad(
+    expect(termToSignature(DF.quad(
       DF.namedNode('s'),
       DF.namedNode('p'),
       DF.blankNode('abc'),
@@ -1166,11 +1180,11 @@ describe('termToSignature', () => {
       DF.namedNode('p'),
       DF.blankNode('abc'),
       DF.namedNode('g'),
-    ))).toEqual('@self');
+    ))).toBe('@self');
   });
 
   it('should be the node string for non-equal quads with no blank nodes', () => {
-    return expect(termToSignature(DF.quad(
+    expect(termToSignature(DF.quad(
       DF.namedNode('s'),
       DF.namedNode('p'),
       DF.namedNode('o'),
@@ -1180,11 +1194,11 @@ describe('termToSignature', () => {
       DF.namedNode('p2'),
       DF.namedNode('o2'),
       DF.namedNode('g2'),
-    ))).toEqual('<s|p|o|g>');
+    ))).toBe('<s|p|o|g>');
   });
 
   it('should contain @blank for non-equal quads with blank nodes that are not hashed yet', () => {
-    return expect(termToSignature(DF.quad(
+    expect(termToSignature(DF.quad(
       DF.namedNode('s'),
       DF.namedNode('p'),
       DF.blankNode('abc'),
@@ -1194,11 +1208,11 @@ describe('termToSignature', () => {
       DF.namedNode('p2'),
       DF.namedNode('o2'),
       DF.namedNode('g2'),
-    ))).toEqual('<s|p|@blank|g>');
+    ))).toBe('<s|p|@blank|g>');
   });
 
   it('should contain be the hash for non-equal quads with blank nodes that are hashed yet', () => {
-    return expect(termToSignature(DF.quad(
+    expect(termToSignature(DF.quad(
       DF.namedNode('s'),
       DF.namedNode('p'),
       DF.blankNode('abc'),
@@ -1208,37 +1222,37 @@ describe('termToSignature', () => {
       DF.namedNode('p2'),
       DF.namedNode('o2'),
       DF.namedNode('g2'),
-    ))).toEqual('<s|p|123|g>');
+    ))).toBe('<s|p|123|g>');
   });
 });
 
 describe('isTermGrounded', () => {
   it('should be true for Named Nodes', () => {
-    return expect(isTermGrounded(DF.namedNode('abc'), {})).toBeTruthy();
+    expect(isTermGrounded(DF.namedNode('abc'), {})).toBeTruthy();
   });
 
   it('should be true for Literals', () => {
-    return expect(isTermGrounded(DF.literal('abc'), {})).toBeTruthy();
+    expect(isTermGrounded(DF.literal('abc'), {})).toBeTruthy();
   });
 
   it('should be true for Variables', () => {
-    return expect(isTermGrounded(DF.variable('abc'), {})).toBeTruthy();
+    expect(isTermGrounded(DF.variable('abc'), {})).toBeTruthy();
   });
 
   it('should be true for Default Graphs', () => {
-    return expect(isTermGrounded(DF.defaultGraph(), {})).toBeTruthy();
+    expect(isTermGrounded(DF.defaultGraph(), {})).toBeTruthy();
   });
 
   it('should be false for blank nodes that are not included in the hash', () => {
-    return expect(isTermGrounded(DF.blankNode('abc'), { xyz: 123 })).toBeFalsy();
+    expect(isTermGrounded(DF.blankNode('abc'), { xyz: 123 })).toBeFalsy();
   });
 
   it('should be true for blank nodes that are included in the hash', () => {
-    return expect(isTermGrounded(DF.blankNode('abc'), { '_:abc': 123 })).toBeTruthy();
+    expect(isTermGrounded(DF.blankNode('abc'), { '_:abc': 123 })).toBeTruthy();
   });
 
   it('should be true for nested quads without blank nodes', () => {
-    return expect(isTermGrounded(DF.quad(
+    expect(isTermGrounded(DF.quad(
       DF.quad(
         DF.namedNode('s'),
         DF.namedNode('p'),
@@ -1252,7 +1266,7 @@ describe('isTermGrounded', () => {
   });
 
   it('should be false for nested quads with a blank node not included in the hash', () => {
-    return expect(isTermGrounded(DF.quad(
+    expect(isTermGrounded(DF.quad(
       DF.quad(
         DF.namedNode('s'),
         DF.namedNode('p'),
@@ -1266,7 +1280,7 @@ describe('isTermGrounded', () => {
   });
 
   it('should be false for nested quads with multiple blank nodes not included in the hash', () => {
-    return expect(isTermGrounded(DF.quad(
+    expect(isTermGrounded(DF.quad(
       DF.quad(
         DF.namedNode('s'),
         DF.namedNode('p'),
@@ -1280,7 +1294,7 @@ describe('isTermGrounded', () => {
   });
 
   it('should be true for nested quads with a blank node included in the hash', () => {
-    return expect(isTermGrounded(DF.quad(
+    expect(isTermGrounded(DF.quad(
       DF.quad(
         DF.namedNode('s'),
         DF.namedNode('p'),
@@ -1294,7 +1308,7 @@ describe('isTermGrounded', () => {
   });
 
   it('should be true for nested quads with multiple blank nodes included in the hash', () => {
-    return expect(isTermGrounded(DF.quad(
+    expect(isTermGrounded(DF.quad(
       DF.quad(
         DF.namedNode('s'),
         DF.namedNode('p'),
@@ -1308,7 +1322,7 @@ describe('isTermGrounded', () => {
   });
 
   it('should be false for nested quads with multiple nested blank nodes not included in the hash', () => {
-    return expect(isTermGrounded(DF.quad(
+    expect(isTermGrounded(DF.quad(
       DF.quad(
         DF.namedNode('s'),
         DF.namedNode('p'),
@@ -1322,7 +1336,7 @@ describe('isTermGrounded', () => {
   });
 
   it('should be true for nested quads with multiple nested blank nodes included in the hash', () => {
-    return expect(isTermGrounded(DF.quad(
+    expect(isTermGrounded(DF.quad(
       DF.quad(
         DF.namedNode('s'),
         DF.namedNode('p'),
