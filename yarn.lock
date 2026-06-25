@@ -1708,7 +1708,7 @@ arraybuffer.prototype.slice@^1.0.4:
     get-intrinsic "^1.2.6"
     is-array-buffer "^3.0.4"
 
-arrayify-stream@*:
+arrayify-stream@*, arrayify-stream@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/arrayify-stream/-/arrayify-stream-3.0.0.tgz#b65eef30ab1d34d45b23d4897d310d1431a82d44"
   integrity sha512-h2/Pb4+zcBZkRvzlhSVQf+Vo2oDaPCPYp6nyYlabAtP7YudhmUtOMROdCKFGbVQX+Bpwfdrm7fP4vqBGT6qrDA==
