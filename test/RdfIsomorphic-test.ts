@@ -1,6 +1,7 @@
 import { createReadStream, readdirSync } from 'node:fs';
 import path from 'node:path';
 import type * as RDF from '@rdfjs/types';
+import { arrayifyStream } from 'arrayify-stream';
 import { StreamParser } from 'n3';
 import { DataFactory } from 'rdf-data-factory';
 import {
@@ -20,9 +21,6 @@ import {
   termToSignature,
   uniqGraph,
 } from '../lib/RdfIsomorphic';
-
-// Tslint:disable-next-line:no-var-requires
-const arrayifyStream = require('arrayify-stream');
 
 const DF = new DataFactory<RDF.BaseQuad>();
 
@@ -200,7 +198,7 @@ function loadIsomorphicFiles(pathDir: string, expected: boolean) {
 }
 
 function loadGraph(file: string): Promise<RDF.Quad[]> {
-  return arrayifyStream(createReadStream(file).pipe(new StreamParser({ baseIRI: file })));
+  return arrayifyStream<RDF.Quad>(createReadStream(file).pipe(new StreamParser({ baseIRI: file })));
 }
 
 describe('hashValues', () => {

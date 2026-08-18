@@ -1093,13 +1093,6 @@
   dependencies:
     tslib "^2.4.0"
 
-"@types/arrayify-stream@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@types/arrayify-stream/-/arrayify-stream-3.0.0.tgz#3d8b652447408fb92849bba44b8eb35293ca7f4c"
-  integrity sha512-AI3xNycs4nHfZXtK4WttyKVXP1Bg4HyPIetezSF7aTZZcp5CboIhr1nP1X/Q8HV7kCRlmRzahs+uo5SzeJlF0g==
-  dependencies:
-    arrayify-stream "*"
-
 "@types/babel__core@^7.20.5":
   version "7.20.5"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.20.5.tgz#3df15f27ba85319caa07ba08d0721889bb39c017"
@@ -1708,15 +1701,15 @@ arraybuffer.prototype.slice@^1.0.4:
     get-intrinsic "^1.2.6"
     is-array-buffer "^3.0.4"
 
-arrayify-stream@*, arrayify-stream@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/arrayify-stream/-/arrayify-stream-3.0.0.tgz#b65eef30ab1d34d45b23d4897d310d1431a82d44"
-  integrity sha512-h2/Pb4+zcBZkRvzlhSVQf+Vo2oDaPCPYp6nyYlabAtP7YudhmUtOMROdCKFGbVQX+Bpwfdrm7fP4vqBGT6qrDA==
-
 arrayify-stream@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/arrayify-stream/-/arrayify-stream-1.0.0.tgz#9e8e113d43325c3a44e965c59b5b89d962b9a37f"
   integrity sha512-RP80ep76Lbew2wWN5ogrl2NluTnBVYYh2K3NNCcWfcmmUB7nBcNBctiJeEZAixp3I1vQ9H88iHZ9MbHSdkuupQ==
+
+arrayify-stream@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/arrayify-stream/-/arrayify-stream-3.0.0.tgz#b65eef30ab1d34d45b23d4897d310d1431a82d44"
+  integrity sha512-h2/Pb4+zcBZkRvzlhSVQf+Vo2oDaPCPYp6nyYlabAtP7YudhmUtOMROdCKFGbVQX+Bpwfdrm7fP4vqBGT6qrDA==
 
 arrify@^1.0.1:
   version "1.0.1"
