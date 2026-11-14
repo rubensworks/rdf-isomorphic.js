@@ -6,6 +6,7 @@ import { StreamParser } from 'n3';
 import { DataFactory } from 'rdf-data-factory';
 import {
   deindexGraph,
+  getBijection,
   getGraphBlankNodes,
   getQuadsWithBlankNodes,
   getQuadsWithoutBlankNodes,
@@ -14,6 +15,7 @@ import {
   hashValues,
   hasValue,
   indexGraph,
+  isBijectionValid,
   isomorphic,
   isTermGrounded,
   quadToSignature,
@@ -179,6 +181,95 @@ describe('isomorphic', () => {
       ];
       expect(isomorphic(graphA, graphB)).toBe(false);
     });
+  });
+});
+
+describe('getBijection', () => {
+  const p = DF.namedNode('ex:p');
+  const edge = (a: string, b: string): RDF.BaseQuad => DF.quad(DF.blankNode(a), p, DF.blankNode(b));
+
+  function expectValidBijection(graphA: RDF.BaseQuad[], graphB: RDF.BaseQuad[]): void {
+    const bijection = getBijection(graphA, graphB)!;
+    expect(bijection).not.toBeNull();
+    const mapped = graphA.map(quad => `${bijection[`_:${quad.subject.value}`]} ${bijection[`_:${quad.object.value}`]}`);
+    const expected = graphB.map(quad => `_:${quad.subject.value} _:${quad.object.value}`);
+    expect(mapped.sort()).toEqual(expected.sort());
+    expect(new Set(Object.values(bijection)).size).toBe(Object.keys(bijection).length);
+  }
+
+  it('should return null for two 2-cycles vs one 4-cycle', () => {
+    const twoCycles = [ edge('a', 'b'), edge('b', 'a'), edge('c', 'd'), edge('d', 'c') ];
+    const oneCycle = [ edge('u', 'v'), edge('v', 'w'), edge('w', 'x'), edge('x', 'u') ];
+    expect(getBijection(twoCycles, oneCycle)).toBeNull();
+    expect(getBijection(oneCycle, twoCycles)).toBeNull();
+  });
+
+  it('should return null for two 3-cycles vs one 6-cycle', () => {
+    const twoCycles = [
+      edge('a', 'b'),
+      edge('b', 'c'),
+      edge('c', 'a'),
+      edge('d', 'e'),
+      edge('e', 'f'),
+      edge('f', 'd'),
+    ];
+    const oneCycle = [
+      edge('a', 'b'),
+      edge('b', 'c'),
+      edge('c', 'd'),
+      edge('d', 'e'),
+      edge('e', 'f'),
+      edge('f', 'a'),
+    ];
+    expect(getBijection(twoCycles, oneCycle)).toBeNull();
+  });
+
+  it('should return a valid bijection for a reordered 4-cycle', () => {
+    const oneCycle = [ edge('u', 'v'), edge('v', 'w'), edge('w', 'x'), edge('x', 'u') ];
+    const reordered = [ edge('m1', 'm2'), edge('m4', 'm1'), edge('m2', 'm3'), edge('m3', 'm4') ];
+    expectValidBijection(oneCycle, reordered);
+    expectValidBijection(reordered, oneCycle);
+  });
+
+  it('should return a valid bijection for reordered 2-cycles', () => {
+    const twoCycles = [ edge('a', 'b'), edge('b', 'a'), edge('c', 'd'), edge('d', 'c') ];
+    const reordered = [ edge('x', 'w'), edge('z', 'y'), edge('w', 'x'), edge('y', 'z') ];
+    expectValidBijection(twoCycles, reordered);
+  });
+});
+
+describe('isBijectionValid', () => {
+  const p = DF.namedNode('ex:p');
+
+  it('should be false for graphs with a different number of quads', () => {
+    expect(isBijectionValid(
+      { '_:a': '_:b' },
+      [ DF.quad(DF.blankNode('a'), p, DF.namedNode('ex:o')) ],
+      [],
+    )).toBe(false);
+  });
+
+  it('should be true if every quad is mapped onto the other graph', () => {
+    expect(isBijectionValid(
+      { '_:a': '_:x', '_:b': '_:y' },
+      [ DF.quad(DF.blankNode('a'), p, DF.blankNode('b')), DF.quad(DF.blankNode('b'), p, DF.literal('a b')) ],
+      [ DF.quad(DF.blankNode('y'), p, DF.literal('a b')), DF.quad(DF.blankNode('x'), p, DF.blankNode('y')) ],
+    )).toBe(true);
+  });
+
+  it('should be false if a quad is not mapped onto the other graph', () => {
+    expect(isBijectionValid(
+      { '_:a': '_:x', '_:b': '_:y' },
+      [ DF.quad(DF.blankNode('a'), p, DF.blankNode('b')), DF.quad(DF.blankNode('b'), p, DF.blankNode('a')) ],
+      [ DF.quad(DF.blankNode('x'), p, DF.blankNode('y')), DF.quad(DF.blankNode('y'), p, DF.blankNode('y')) ],
+    )).toBe(false);
+  });
+
+  it('should map blank nodes inside quoted triples', () => {
+    const o = DF.namedNode('ex:o');
+    const quoted = (s: string): RDF.BaseQuad => DF.quad(DF.quad(DF.blankNode(s), p, o), p, o);
+    expect(isBijectionValid({ '_:a': '_:x' }, [ quoted('a') ], [ quoted('x') ])).toBe(true);
+    expect(isBijectionValid({ '_:a': '_:y' }, [ quoted('a') ], [ quoted('x') ])).toBe(false);
   });
 });
 

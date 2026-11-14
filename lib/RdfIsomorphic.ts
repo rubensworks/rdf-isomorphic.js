@@ -65,68 +65,108 @@ export function getBijectionInner<TQ extends RDF.BaseQuad = RDF.Quad>(
   const [ hashesA, ungroundedHashesA ] = hashTerms(blankQuadsA, blankNodesA, groundedHashesA);
   const [ hashesB, ungroundedHashesB ] = hashTerms(blankQuadsB, blankNodesB, groundedHashesB);
 
-  // Break quickly if a graph contains a grounded node that is not contained in the other graph.
-  if (Object.keys(hashesA).length !== Object.keys(hashesB).length) {
+  // Break quickly if the graphs do not contain the same grounded node hashes.
+  const groundedValuesA: number[] = Object.values(hashesA).sort((a, b) => a - b);
+  const groundedValuesB: number[] = Object.values(hashesB).sort((a, b) => a - b);
+  if (blankNodesA.length !== blankNodesB.length || !arraysEqual(groundedValuesA, groundedValuesB)) {
     return null;
   }
-  for (const hashKeyA in hashesA) {
-    if (!hasValue(hashesB, hashesA[hashKeyA])) {
-      return null;
-    }
-  }
 
-  // Map the blank nodes from graph A to the blank nodes of graph B using the created hashes.
-  // Grounded hashes will also be equal, but not needed here, we will need them in the next recursion
-  // (as we only recurse on grounded nodes).
-  let bijection: IBijection | null = {};
+  // Map the blank nodes from graph A to the blank nodes of graph B using the grounded hashes.
+  // Only hashes that occur once in each graph identify a single node.
+  const groundedCountsA: Map<number, number> = countValues(hashesA);
+  const bijection: IBijection = {};
+  const unmappedA: string[] = [];
+  const unmappedB: Set<string> = new Set(blankNodesB.map(termToString));
   for (const blankNodeA of blankNodesA) {
     const blankNodeAString: string = termToString(blankNodeA);
-    const blankNodeAHash: number = ungroundedHashesA[blankNodeAString];
-    for (const blankNodeBString in ungroundedHashesB) {
-      if (ungroundedHashesB[blankNodeBString] === blankNodeAHash) {
-        bijection[blankNodeAString] = blankNodeBString;
-        delete ungroundedHashesB[blankNodeBString];
-        break;
+    const hash: number | undefined = hashesA[blankNodeAString];
+    if (hash !== undefined && groundedCountsA.get(hash) === 1) {
+      const blankNodeBString: string = Object.keys(hashesB).find(key => hashesB[key] === hash)!;
+      bijection[blankNodeAString] = blankNodeBString;
+      unmappedB.delete(blankNodeBString);
+    } else {
+      unmappedA.push(blankNodeAString);
+    }
+  }
+
+  // If all nodes are mapped, the bijection is only valid if it maps every quad of graph A onto graph B.
+  if (unmappedA.length === 0) {
+    return isBijectionValid(bijection, blankQuadsA, blankQuadsB) ? bijection : null;
+  }
+
+  // Otherwise, speculatively mark the first unmapped node of graph A as bijected
+  // with each unmapped node of graph B that has the same hash, and recurse.
+  // That node must map to one of these candidates, so if none of them works, there is no bijection.
+  const blankNodeAString: string = unmappedA[0];
+  const blankNodeAHash: number = hashesA[blankNodeAString] ?? ungroundedHashesA[blankNodeAString];
+  const hash: number = hashNumber(blankNodeAString);
+  for (const blankNodeBString of unmappedB) {
+    const blankNodeBHash: number = hashesB[blankNodeBString] ?? ungroundedHashesB[blankNodeBString];
+    if (blankNodeAHash === blankNodeBHash) {
+      const result: IBijection | null = getBijectionInner(
+        blankQuadsA,
+        blankQuadsB,
+        blankNodesA,
+        blankNodesB,
+        { ...hashesA, [blankNodeAString]: hash },
+        { ...hashesB, [blankNodeBString]: hash },
+      );
+      if (result) {
+        return result;
       }
     }
   }
 
-  // Check if all nodes from graph A and B are present in the bijection,
-  // if not, speculatively mark pairs with matching ungrounded hashes as bijected, and recurse.
-  const bijectionA: string[] = Object.keys(bijection).sort((a, b) => a.localeCompare(b));
-  const bijectionB: string[] = hashValues(bijection).sort((a, b) => a.localeCompare(b));
-  const nodesA: string[] = blankNodesA.map(termToString).sort((a, b) => a.localeCompare(b));
-  const nodesB: string[] = blankNodesB.map(termToString).sort((a, b) => a.localeCompare(b));
-  if (!arraysEqual(bijectionA, nodesA) || !arraysEqual(bijectionB, nodesB)) {
-    // I have not yet been able to find any pathological cases where this code is reached.
-    // This may be removable, but let's wait until someone proves that.
-    bijection = null;
+  return null;
+}
 
-    for (const blankNodeA of blankNodesA) {
-      // Only replace ungrounded node hashes
-      const blankNodeAString: string = termToString(blankNodeA);
-      if (!hashesA[blankNodeAString]) {
-        for (const blankNodeB of blankNodesB) {
-          // Only replace ungrounded node hashes
-          const blankNodeBString: string = termToString(blankNodeB);
-          if (!hashesB[blankNodeBString] &&
-            ungroundedHashesA[blankNodeAString] === ungroundedHashesB[blankNodeBString]) {
-            const hash: number = hashNumber(blankNodeAString);
-            bijection = getBijectionInner(
-              blankQuadsA,
-              blankQuadsB,
-              blankNodesA,
-              blankNodesB,
-              { ...hashesA, [blankNodeAString]: hash },
-              { ...hashesB, [blankNodeBString]: hash },
-            );
-          }
-        }
-      }
-    }
+/**
+ * Count how often each value occurs in the given hash.
+ * @param hash A hash.
+ * @return {Map<number, number>} A map from value to number of occurrences.
+ */
+function countValues(hash: ITermHash): Map<number, number> {
+  const counts: Map<number, number> = new Map();
+  for (const key in hash) {
+    counts.set(hash[key], (counts.get(hash[key]) ?? 0) + 1);
   }
+  return counts;
+}
 
-  return bijection;
+/**
+ * Check if the given bijection maps every quad of graph A onto a quad of graph B.
+ * @param {IBijection} bijection A bijection from blank nodes of graph A to blank nodes of graph B.
+ * @param {Quad[]} blankQuadsA Unique quads with blank nodes of graph A.
+ * @param {Quad[]} blankQuadsB Unique quads with blank nodes of graph B.
+ * @return {boolean} If the bijection maps graph A onto graph B.
+ */
+export function isBijectionValid<TQ extends RDF.BaseQuad = RDF.Quad>(
+  bijection: IBijection,
+  blankQuadsA: TQ[],
+  blankQuadsB: TQ[],
+): boolean {
+  if (blankQuadsA.length !== blankQuadsB.length) {
+    return false;
+  }
+  const quadsB: Set<string> = new Set(blankQuadsB.map(quad => quadToMappedString(quad)));
+  return blankQuadsA.every(quad => quadsB.has(quadToMappedString(quad, bijection)));
+}
+
+/**
+ * Convert the given quad to a string, replacing blank nodes using the given bijection.
+ * @param {Quad} quad A quad.
+ * @param {IBijection} bijection An optional bijection to rename blank nodes with.
+ * @return {string} A string representation of the quad.
+ */
+function quadToMappedString(quad: RDF.BaseQuad, bijection?: IBijection): string {
+  return JSON.stringify(getTerms(quad).map((term: RDF.Term) => {
+    if (term.termType === 'Quad') {
+      return quadToMappedString(term, bijection);
+    }
+    const termString: string = termToString(term);
+    return term.termType === 'BlankNode' && bijection ? bijection[termString] : termString;
+  }));
 }
 
 function arraysEqual(array1: any[], array2: any[]): boolean {
