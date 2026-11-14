@@ -1,0 +1,6 @@
+_:a <ex:p> _:b .
+_:b <ex:p> _:c .
+_:c <ex:p> _:d .
+_:d <ex:p> _:e .
+_:e <ex:p> _:f .
+_:f <ex:p> _:a .
